@@ -1,6 +1,17 @@
 import { Stone } from './stone'
 
 export function checkBeating(stones: number[][], whichTeamIsOn: number, newStone: Stone) {
+    const kingPos: Stone = getKingPos(stones)
+    if (
+        (kingPos.row == 0 && kingPos.col == 0) ||
+        (kingPos.row == 0 && kingPos.col == stones.length - 1) ||
+        (kingPos.row == stones.length - 1 && kingPos.col == 0) ||
+        (kingPos.row == stones.length - 1 && kingPos.col == stones.length - 1)
+    ) {
+        // king has won!
+        return (stones)
+    }
+
     var afterBeating: number[][] | number
     afterBeating = checkSimpleBeating(stones, whichTeamIsOn, newStone)
     afterBeating = checkKing(afterBeating)
@@ -51,7 +62,7 @@ function checkKing(stones: number[][]) {
         return (2) // team 2 has won!
     }
 
-    // if on the edge, king is not touched by 4-side- rule
+    // if on the edge, king is not touched by 4-side-rule
     if (kingPos.row == 0 || kingPos.row == stones.length - 1 ||
         kingPos.col == 0 || kingPos.col == stones.length - 1) return (stones)
 
