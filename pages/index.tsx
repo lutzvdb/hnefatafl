@@ -1,4 +1,5 @@
 import type { NextPage } from 'next'
+import Head from 'next/head'
 import { useState } from 'react'
 import Game from '../components/game'
 
@@ -8,12 +9,17 @@ const Home: NextPage = () => {
   const classNames = "h-screen w-screen " + bgColor
 
   return (
-    <div className={classNames}>
-      <div className="text-6xl text-center pt-5">
-        HNEFATAFL
+    <>
+      <Head>
+        <title>hnefatafl</title>
+      </Head>
+      <div className={classNames}>
+        <div className="text-6xl text-center pt-5">
+          hnefatafl
+        </div>
+        <Game setBgColor={setBgColor} />
       </div>
-      <Game setBgColor={setBgColor} />
-    </div>
+    </>
   )
 }
 
