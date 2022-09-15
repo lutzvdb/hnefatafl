@@ -3,14 +3,73 @@ import { Stone } from './stone'
 export function checkBeating(stones: number[][], whichTeamIsOn: number, newStone: Stone) {
     var afterBeating: number[][] | number
     afterBeating = checkSimpleBeating(stones, whichTeamIsOn, newStone)
-    afterBeating = checkKingFourSides(afterBeating, whichTeamIsOn, newStone)
+    afterBeating = checkKingFourSides(afterBeating)
+    afterBeating = checkKingEdge(afterBeating)
 
     return (afterBeating)
 }
 
+function getKingPos(stones: number[][]) {
+    var kingPos: Stone = { row: 4, col: 4 } // Default
+    stones.map((r, rid) => r.map((i, cid) => {
+        if (i == 3) kingPos = { row: rid, col: cid }
+    }))
+
+    return (kingPos)
+}
+
+// if king is at the edge, has to be surrounded on 3 sides to lose
+function checkKingEdge(stones: number[][]) {
+    const kingPos: Stone = getKingPos(stones)
+
+    // if on the edge, king is not touched by this rule
+    if (kingPos.row == 0 &&
+        stones[kingPos.row + 1][kingPos.col] == 2 &&
+        stones[kingPos.row][kingPos.col - 1] == 2 &&
+        stones[kingPos.row][kingPos.col + 1] == 2) {
+        return (2) // team 2 has won!
+    }
+
+    if (kingPos.row == stones.length - 1 &&
+        stones[kingPos.row - 1][kingPos.col] == 2 &&
+        stones[kingPos.row][kingPos.col - 1] == 2 &&
+        stones[kingPos.row][kingPos.col + 1] == 2) {
+        return (2) // team 2 has won!
+    }
+
+    if (kingPos.col == 0 &&
+        stones[kingPos.row - 1][kingPos.col] == 2 &&
+        stones[kingPos.row + 1][kingPos.col] == 2 &&
+        stones[kingPos.row][kingPos.col + 1] == 2) {
+        return (2) // team 2 has won!
+    }
+
+    if (kingPos.col == stones.length - 1 &&
+        stones[kingPos.row - 1][kingPos.col] == 2 &&
+        stones[kingPos.row + 1][kingPos.col] == 2 &&
+        stones[kingPos.row][kingPos.col - 1] == 2) {
+        return (2) // team 2 has won!
+    }
+
+    return (stones)
+}
+
 // if the king is surrounded by 4 sides, he's done
-function checkKingFourSides(stones: number[][], whichTeamIsOn: number, newStone: Stone) {
-    if (stones[0][1] == 7) return (1)
+function checkKingFourSides(stones: number[][]) {
+    const kingPos: Stone = getKingPos(stones)
+
+    // if on the edge, king is not touched by this rule
+    if (kingPos.row == 0 || kingPos.row == stones.length - 1 ||
+        kingPos.col == 0 || kingPos.col == stones.length - 1) return (stones)
+
+    // check if surrounded on all sides
+    if (stones[kingPos.row - 1][kingPos.col] == 2 &&
+        stones[kingPos.row + 1][kingPos.col] == 2 &&
+        stones[kingPos.row][kingPos.col - 1] == 2 &&
+        stones[kingPos.row][kingPos.col + 1] == 2) {
+        return (2) // team 2 has won!
+    }
+
     return (stones)
 }
 
