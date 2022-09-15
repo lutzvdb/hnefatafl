@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    font-family: Nabla, sans-serif;
+    background-color: rgba(0, 0, 255, 0.01)
+}
