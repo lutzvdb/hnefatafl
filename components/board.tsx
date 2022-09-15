@@ -7,7 +7,8 @@ export default function Board(props: {
     handleStoneClicked: Function,
     handleMouseOver: Function,
     validPathInSelection: boolean,
-    selectedStone: Stone | null
+    selectedStone: Stone | null,
+    whichTeamIsOn: number
 }) {
 
     const getProperStyle = (item: number, row: number, col: number) => {
@@ -55,6 +56,10 @@ export default function Board(props: {
             (
                 props.myteam.includes(item) ||
                 (item == 3 && props.myteam.includes(1))
+            ) && 
+            (
+                item == props.whichTeamIsOn ||
+                (item == 3 && props.whichTeamIsOn == 1)
             )
         ) styles += " hover:scale-125"
 

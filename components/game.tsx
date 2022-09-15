@@ -10,6 +10,7 @@ export default function Game() {
     const [visibleStones, setVisibleStones] = useState(defaultStones)
     const [actualStones, setActualStones] = useState(defaultStones)
     const [validPathInSelection, setValidPathInSelection] = useState(false)
+    const [whichTeamIsOn, setWhichTeamIsOn] = useState(2)
 
     const myteam = [1, 2]
 
@@ -30,6 +31,7 @@ export default function Game() {
             setVisibleStones(newStones)
             setValidPathInSelection(false)
             setSelectedStone(null)
+            setWhichTeamIsOn(whichTeamIsOn == 1 ? 2 : 1)
         } else {
             if(!clickedStone.value || clickedStone.value <= 0) return
             if(myteam.includes(clickedStone.value) ||
@@ -83,6 +85,7 @@ export default function Game() {
                     handleMouseOver={handleMouseOver}
                     validPathInSelection={validPathInSelection}
                     selectedStone={selectedStone}
+                    whichTeamIsOn={whichTeamIsOn}
                 />
             </div>
         </div>
