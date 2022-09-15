@@ -17,6 +17,21 @@ export function isValidMove(
             (to.row == from.row && Math.abs(to.col - from.col) > 3)
         ) return (false)
     }
+    if( // only king can go to the extreme corners
+        (
+            (to.row == 0 || to.row == stones.length - 1) && 
+            (to.col == 0 || to.col == stones.length - 1)
+        ) &&
+        from.value != 3
+    ) return(false)
+    if( // only king can go to the middle
+        (
+            (to.row == (stones.length - 1) / 2) && 
+            (to.col == (stones.length - 1) / 2) 
+        ) &&
+        from.value != 3
+    ) return(false)
+    
 
     // ok, we have a generally valid path
     // let's get intersecting cells

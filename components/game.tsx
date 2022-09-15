@@ -4,6 +4,7 @@ import { isValidMove } from '../lib/moveValidity'
 import { defaultStones } from '../lib/initialSetup'
 import { Stone } from '../lib/stone'
 import { moveStone } from '../lib/path'
+import { checkBeating } from '../lib/beating'
 
 export default function Game(props: {
     setBgColor: Function
@@ -27,7 +28,8 @@ export default function Game(props: {
                 return 
             }
 
-            const newStones = moveStone(actualStones, selectedStone, clickedStone)
+            var newStones = moveStone(actualStones, selectedStone, clickedStone)
+            newStones = checkBeating(newStones, clickedStone)
             
             setActualStones(newStones)
             setVisibleStones(newStones)
@@ -36,8 +38,8 @@ export default function Game(props: {
             setWhichTeamIsOn(whichTeamIsOn == 1 ? 2 : 1)
         } else {
             if(!clickedStone.value || clickedStone.value <= 0) return
-            if(myteam.includes(clickedStone.value) ||
-                (myteam.includes(1) && clickedStone.value == 3)) {
+            if(whichTeamIsOn == clickedStone.value ||
+                (whichTeamIsOn == 1 && clickedStone.value == 3)) {
                 // we selected which stone we want to move
                 setSelectedStone(clickedStone)
             }
