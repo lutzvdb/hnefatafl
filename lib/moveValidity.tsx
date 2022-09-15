@@ -17,21 +17,21 @@ export function isValidMove(
             (to.row == from.row && Math.abs(to.col - from.col) > 3)
         ) return (false)
     }
-    if( // only king can go to the extreme corners
+    if ( // only king can go to the extreme corners
         (
-            (to.row == 0 || to.row == stones.length - 1) && 
+            (to.row == 0 || to.row == stones.length - 1) &&
             (to.col == 0 || to.col == stones.length - 1)
         ) &&
         from.value != 3
-    ) return(false)
-    if( // only king can go to the middle
+    ) return (false)
+    if ( // only king can go to the middle
         (
-            (to.row == (stones.length - 1) / 2) && 
-            (to.col == (stones.length - 1) / 2) 
+            (to.row == (stones.length - 1) / 2) &&
+            (to.col == (stones.length - 1) / 2)
         ) &&
         from.value != 3
-    ) return(false)
-    
+    ) return (false)
+
 
     // ok, we have a generally valid path
     // let's get intersecting cells
@@ -39,7 +39,7 @@ export function isValidMove(
     // (not allowed)
 
     const plannedPath = getPath(from, to)
-    
+
     // loop through planned path and see if any spots are taken
     // if so, invalid
     // otherwise, go ahead
@@ -47,8 +47,8 @@ export function isValidMove(
     const hasTakenSpots = plannedPath.map(
         step => stones[step.row][step.col] == 0 ? false : true
     )
-    
-    if(hasTakenSpots.includes(true)) return (false)
+
+    if (hasTakenSpots.includes(true)) return (false)
 
     return plannedPath
 }

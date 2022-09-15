@@ -35,12 +35,12 @@ export default function Board(props: {
 
         if (
             // if a stone is selected, rotate it a bit
-            row == props.selectedStone?.row && 
+            row == props.selectedStone?.row &&
             col == props.selectedStone?.col
         ) {
             styles += " rotate-[25deg]"
         }
-        
+
         if (
             // option 1: we're trying to move
             // and are hovering over an empty field
@@ -55,7 +55,7 @@ export default function Board(props: {
             (
                 props.myteam.includes(item) ||
                 (item == 3 && props.myteam.includes(1))
-            ) && 
+            ) &&
             (
                 item == props.whichTeamIsOn ||
                 (item == 3 && props.whichTeamIsOn == 1)
@@ -68,9 +68,9 @@ export default function Board(props: {
     var gridClasses = `grid 
         gap-2 md:gap-4 lg:gap-4 xl:gap-5 2xl:gap-5
         w-full h-full`
-    
-    if(props.stones.length == 11) gridClasses += ' grid-cols-11'
-    if(props.stones.length == 9) gridClasses += ' grid-cols-9'
+
+    if (props.stones.length == 11) gridClasses += ' grid-cols-11'
+    if (props.stones.length == 9) gridClasses += ' grid-cols-9'
 
     return (
         <div className={gridClasses}>
