@@ -1,11 +1,13 @@
 import Board from '../components/board'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { isValidMove } from '../lib/moveValidity'
 import { defaultStones } from '../lib/initialSetup'
 import { Stone } from '../lib/stone'
 import { moveStone } from '../lib/path'
 
-export default function Game() {
+export default function Game(props: {
+    setBgColor: Function
+}) {
     const [selectedStone, setSelectedStone] = useState<Stone|null>(null)
     const [visibleStones, setVisibleStones] = useState(defaultStones)
     const [actualStones, setActualStones] = useState(defaultStones)
@@ -70,9 +72,14 @@ export default function Game() {
         }
     }
 
+    useEffect(() => {
+        if(whichTeamIsOn == 1) props.setBgColor(" bg-emerald-50")
+        if(whichTeamIsOn == 2) props.setBgColor(" bg-rose-50")
+    }, [whichTeamIsOn])
+
     return (
-        <div className="grid place-content-center">
-            <div className="aspect-square 
+        <div className="grid place-content-center mt-5">
+            <div className="aspect-square  
               p-3 md:p-5 lg:p-5 xl:p-5 2xl:p-5
       " style={{
                     width: '100vh',
