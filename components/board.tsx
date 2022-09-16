@@ -27,11 +27,23 @@ export default function Board(props: {
         // -1 = considering move
 
         // handle colors...
-        if (item == 0) styles = styles + " bg-stone-100"
-        if (item == 1) styles = styles + " bg-emerald-200"
-        if (item == 2) styles = styles + " bg-rose-200"
-        if (item == 3) styles = styles + " bg-yellow-200"
-        if (item == -1) styles = styles + " bg-stone-200"
+        var bgColor = ""
+        if (item == 0) bgColor = " bg-stone-100"
+        if (item == 1) bgColor = " bg-emerald-200"
+        if (item == 2) bgColor = " bg-rose-200"
+        if (item == 3) bgColor = " bg-yellow-200"
+        if (item == -1) bgColor = " bg-stone-200"
+
+        // cornerstones and middle-field are only accessible for king
+        // mark that
+        if (item == 0 && (
+            (row == 0 && col == 0) ||
+            (row == 0 && col == props.stones.length - 1) ||
+            (row == props.stones.length - 1 && col == props.stones.length - 1) ||
+            (row == props.stones.length - 1 && col == 0) ||
+            (row == (props.stones.length - 1) / 2 && col == (props.stones.length - 1) / 2)
+        )) bgColor = " bg-stone-200"
+        styles += bgColor
 
         if (
             // if a stone is selected, rotate it a bit
