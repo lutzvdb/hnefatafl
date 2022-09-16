@@ -25,13 +25,13 @@ export default function Menu(props: {
             backdrop-blur-md
             z-50 
             `}
-            >
+        >
             <div className="grid place-content-center w-full h-full text-6xl text-center rounded-2xl">
                 <div className="bg-white p-10 rounded-3xl bg-opacity-50">
-                    <div className="text-6xl text-center pb-5" >
+                    <div className="text-6xl lg:text-8xl xl:text-8xl 2xl:text-8xl text-center pb-5" >
                         hnefatafl
                     </div>
-                    <div className="text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left" style={{ fontFamily: 'Roboto Mono' }}>
+                    <div className="pl-5 text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left" style={{ fontFamily: 'Roboto Mono' }}>
                         <a href="#" onClick={() => setShowRestart(!showRestart)}>
                             Restart game
                         </a><br />
@@ -52,7 +52,12 @@ export default function Menu(props: {
                         </div>
                         <a href="#" onClick={(() => props.setShowMenu(false))}>
                             Close Menu
-                        </a>
+                        </a><br /><br />
+                        <div className="text-sm">
+                            <a href="https://www.thisislutz.com">
+                                coded by lvdb
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
