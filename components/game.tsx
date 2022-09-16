@@ -1,4 +1,5 @@
 import Board from '../components/board'
+import Menu from '../components/menu'
 import { useEffect, useState } from 'react'
 import { isValidMove } from '../lib/moveValidity'
 import { defaultStones, tablut, hnefatafl, brandubh } from '../lib/initialSetup'
@@ -15,6 +16,7 @@ export default function Game(props: {
     const [validPathInSelection, setValidPathInSelection] = useState(false)
     const [whichTeamIsOn, setWhichTeamIsOn] = useState(2)
     const [winnerTeam, setWinnerTeam] = useState<number | null>(null)
+    const [showMenu, setShowMenu] = useState(false)
 
     const myteam = [1, 2]
 
@@ -115,6 +117,12 @@ export default function Game(props: {
 
     return (
         <>
+            <Menu showMenu={showMenu} setShowMenu={setShowMenu} restartGame={restartGame} />
+            <div className="text-6xl text-center pt-5" >
+                <a href="#" onClick={() => setShowMenu(true)}>
+                    hnefatafl
+                </a>
+            </div>
             <div className="grid place-content-center mt-5">
                 <div className="aspect-square  
               p-3 md:p-5 lg:p-5 xl:p-5 2xl:p-5
@@ -131,18 +139,6 @@ export default function Game(props: {
                         selectedStone={selectedStone}
                         whichTeamIsOn={whichTeamIsOn}
                     />
-                </div>
-                <div className="text-sm text-gray-600 " style={{ fontFamily: 'Roboto Mono' }}>
-                    Restart game as ...<br /><br />
-                    <a href="#" onClick={() => restartGame(brandubh)}>
-                        Brandubh (7x7)
-                    </a> //&nbsp;
-                    <a href="#" onClick={() => restartGame(tablut)}>
-                        Tablut (9x9)
-                    </a> //&nbsp;
-                    <a href="#" onClick={() => restartGame(hnefatafl)}>
-                        Hnefatafl (11x11)
-                    </a>
                 </div>
             </div>
             <div className={

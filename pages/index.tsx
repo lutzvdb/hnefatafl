@@ -14,9 +14,6 @@ const Home: NextPage = () => {
         <title>hnefatafl</title>
       </Head>
       <div className={classNames}>
-        <div className="text-6xl text-center pt-5">
-          hnefatafl
-        </div>
         <Game setBgColor={setBgColor} />
       </div>
     </>
