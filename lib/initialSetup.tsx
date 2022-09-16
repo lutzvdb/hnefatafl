@@ -1,5 +1,5 @@
 
-const hnefatafl = [
+export const hnefatafl = [
   [0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0],
   [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -13,7 +13,7 @@ const hnefatafl = [
   [0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0],
 ]
 
-const tablut = [
+export const tablut = [
   [0, 0, 0, 2, 2, 2, 0, 0, 0],
   [0, 0, 0, 0, 2, 0, 0, 0, 0],
   [0, 0, 0, 0, 1, 0, 0, 0, 0],
@@ -25,4 +25,14 @@ const tablut = [
   [0, 0, 0, 2, 2, 2, 0, 0, 0],
 ]
 
-export const defaultStones = tablut 
+export const brandubh = [
+  [0, 0, 0, 2, 0, 0, 0],
+  [0, 0, 0, 2, 0, 0, 0],
+  [2, 0, 0, 1, 0, 0, 2],
+  [2, 2, 1, 3, 1, 2, 2],
+  [2, 0, 0, 1, 0, 0, 2],
+  [0, 0, 0, 2, 0, 0, 0],
+  [0, 0, 0, 2, 0, 0, 0]
+]
+
+export const defaultStones = brandubh 

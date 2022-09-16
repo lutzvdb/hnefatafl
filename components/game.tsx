@@ -1,7 +1,7 @@
 import Board from '../components/board'
 import { useEffect, useState } from 'react'
 import { isValidMove } from '../lib/moveValidity'
-import { defaultStones } from '../lib/initialSetup'
+import { defaultStones, tablut, hnefatafl, brandubh } from '../lib/initialSetup'
 import { Stone } from '../lib/stone'
 import { moveStone } from '../lib/path'
 import { checkBeating } from '../lib/beating'
@@ -18,10 +18,10 @@ export default function Game(props: {
 
     const myteam = [1, 2]
 
-    const restartGame = () => {
+    const restartGame = (stones: number[][] = defaultStones) => {
         setSelectedStone(null)
-        setVisibleStones(defaultStones)
-        setActualStones(defaultStones)
+        setActualStones(stones)
+        setVisibleStones(stones)
         setValidPathInSelection(false)
         setWhichTeamIsOn(2)
         setWinnerTeam(null)
@@ -132,6 +132,18 @@ export default function Game(props: {
                         whichTeamIsOn={whichTeamIsOn}
                     />
                 </div>
+                <div className="text-sm text-gray-600 " style={{fontFamily: 'Roboto Mono'}}>
+                    Restart game as ...<br /><br />
+                    <a href="#" onClick={() => restartGame(brandubh)}>
+                        Brandubh (7x7)
+                    </a> //&nbsp;
+                    <a href="#" onClick={() => restartGame(tablut)}>
+                        Tablut (9x9)
+                    </a> //&nbsp;
+                    <a href="#" onClick={() => restartGame(hnefatafl)}>
+                        Hnefatafl (11x11)
+                    </a>
+                </div>
             </div>
             <div className={
                 (winnerTeam ? '' : 'hidden ') +
@@ -145,7 +157,7 @@ export default function Game(props: {
                 `}>
                 <div className="grid place-content-center h-full w-full text-6xl text-center">
                     <p>
-                        Team {winnerTeam == 2 ? 'RED' : 'GREEN'} has won!
+                        {winnerTeam == 2 ? 'RED' : 'GREEN'} has won!
                     </p>
                     <p className="my-20">
                         <a href="#" onClick={restartGame}>Restart game</a>
