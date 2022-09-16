@@ -26,7 +26,7 @@ export default function Menu(props: {
                     <div className="text-6xl text-center pb-5" >
                         hnefatafl
                     </div>
-                    <div className="text-3xl text-left" style={{fontFamily: 'Roboto Mono'}}>
+                    <div className="text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left" style={{fontFamily: 'Roboto Mono'}}>
                         Restart game as ...<br />
                         <a href="#" onClick={() => newGame(brandubh)}>
                              - Brandubh (7x7)
