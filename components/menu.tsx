@@ -40,6 +40,10 @@ export default function Menu(props: {
                         <a href="#" onClick={() => newGame(hnefatafl)}>
                              - Hnefatafl (11x11)
                         </a>
+                        <br /><br />
+                        <a href="#" onClick={(() => props.setShowMenu(false))}>
+                            Close Menu
+                        </a>
                     </div>
                 </div>
             </div>
