@@ -18,7 +18,7 @@ export default function Game(props: {
 
     const myteam = [1, 2]
 
-    const restartGame = (stones: number[][] = defaultStones) => {
+    const restartGame = (stones: number[][]) => {
         setSelectedStone(null)
         setActualStones(stones)
         setVisibleStones(stones)
@@ -132,7 +132,7 @@ export default function Game(props: {
                         whichTeamIsOn={whichTeamIsOn}
                     />
                 </div>
-                <div className="text-sm text-gray-600 " style={{fontFamily: 'Roboto Mono'}}>
+                <div className="text-sm text-gray-600 " style={{ fontFamily: 'Roboto Mono' }}>
                     Restart game as ...<br /><br />
                     <a href="#" onClick={() => restartGame(brandubh)}>
                         Brandubh (7x7)
@@ -160,7 +160,7 @@ export default function Game(props: {
                         {winnerTeam == 2 ? 'RED' : 'GREEN'} has won!
                     </p>
                     <p className="my-20">
-                        <a href="#" onClick={restartGame}>Restart game</a>
+                        <a href="#" onClick={() => restartGame(defaultStones)}>Restart game</a>
                     </p>
                 </div>
             </div>
