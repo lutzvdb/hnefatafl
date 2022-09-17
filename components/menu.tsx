@@ -1,4 +1,4 @@
-import { tablut, hnefatafl, brandubh, ardri } from '../lib/initialSetup'
+import { tablut, hnefatafl, brandubh, ardri, tawlbwrdd, aleaEvangelii } from '../lib/initialSetup'
 import { useEffect, useState } from 'react'
 import { getAllSavedGames } from '../lib/savegame'
 
@@ -58,8 +58,8 @@ export default function Menu(props: {
                             <TextField
                                 label="Choose a game name"
                                 variant="standard"
-                                inputProps={{ style: { fontFamily: 'Roboto Mono' } }} 
-                                InputLabelProps={{ style: { fontFamily: 'Roboto Mono' } }} 
+                                inputProps={{ style: { fontFamily: 'Roboto Mono' } }}
+                                InputLabelProps={{ style: { fontFamily: 'Roboto Mono' } }}
                                 onChange={(e) => setNewGameName(e.target.value)}
                                 className="mb-5"
                             />
@@ -122,6 +122,12 @@ export default function Menu(props: {
                             </a><br />
                             <a href="#" onClick={() => newGame(hnefatafl)}>
                                 - Hnefatafl (11x11)
+                            </a><br />
+                            <a href="#" onClick={() => newGame(tawlbwrdd)}>
+                                - Tawlbwrdd (11x11)
+                            </a><br />
+                            <a href="#" onClick={() => newGame(aleaEvangelii)}>
+                                - Alea Evangelii (19x19)
                             </a>
                             <br /><br />
                             <a href="#" onClick={() => { setShowRestart(false); setShowMainMenu(true); }}>
@@ -143,13 +149,15 @@ export default function Menu(props: {
                                 </a><br />
                                 <a href="#" onClick={() => props.setShowMenu(false)}>
                                     Close Menu
-                                </a><br /><br />
-                                <div className="text-sm">
-                                    <a href="https://www.thisislutz.com">
-                                        coded by lvdb
-                                    </a>
-                                </div>
+                                </a>
                             </div>
+                        </div>
+
+                        <div className="border-t border-gray-300 w-full my-5" ></div>
+                        <div className="text-sm" style={{ fontFamily: 'Roboto Mono' }}>
+                            <a href="https://www.thisislutz.com">
+                                coded by lvdb
+                            </a>
                         </div>
                     </div>
                 </div>
