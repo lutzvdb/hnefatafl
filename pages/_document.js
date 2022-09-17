@@ -12,6 +12,7 @@ class MyDocument extends Document {
         <Head>
           <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet" />
           <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet" />
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
 
           <link rel="manifest" href="/manifest.json" />
           <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
