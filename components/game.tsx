@@ -21,7 +21,7 @@ export default function Game(props: {
     const [validPathInSelection, setValidPathInSelection] = useState(false)
     const [whichTeamIsOn, setWhichTeamIsOn] = useState(2)
     const [winnerTeam, setWinnerTeam] = useState<number | null>(null)
-    const [showMenu, setShowMenu] = useState(false)
+    const [showMenu, setShowMenu] = useState(true)
     const [snackbarIsOpen, setSnackbarIsOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState('')
     const [myteam, setMyTeam] = useState([2])
@@ -205,7 +205,7 @@ export default function Game(props: {
             <div className={`text-6xl lg:text-8xl xl:text-8xl 2xl:text-8xl text-center pt-5
                             bg-gradient-to-b from-white ` + (whichTeamIsOn == 1 ? 'bg-emerald-50' : 'bg-rose-50')} >
                 <a href="#" onClick={() => setShowMenu(true)}>
-                    h n e f a t a f l
+                    hnefatafl
                 </a>
             </div>
             <div className={"grid place-content-center mt-5 duration-200 " + (showThinkingIndicator ? ' opacity-50' : '')}>
