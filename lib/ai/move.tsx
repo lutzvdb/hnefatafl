@@ -58,12 +58,13 @@ export function AIGetNextMove(stones: number[][], AIteam: number): stoneMoveWith
         // go through all existing trajectories and calculate next steps
         for(var i = 0; i < trajectories.length; i++) {
             // generate all moves based on this trajectory and append to new list of trajectories
+            
             var movesSoFar = trajectories[i].moves
             var nextSteps = getAllMovesForSituation(
                 movesSoFar[movesSoFar.length-1].stonesAfterMove, 
                 trajectories[i].whichTeamIsOn,
                 currentTeam == AIteam ? scoreTemplateForAI : scoreTemplateForOpponent)
-
+            
             // add all resulting trajectories to list
             var movesFromThisTrajectory: trajectory[] = nextSteps.map(singlestep => ({
                 moves: movesSoFar.concat(singlestep),
@@ -95,6 +96,7 @@ export function AIGetNextMove(stones: number[][], AIteam: number): stoneMoveWith
 function getAllMovesForSituation(stones: number[][], myteam: number, scoreTemplate: scoreTemplate) {
     const myStones = getAllMyStones(stones, myteam)
     const moves = getAllPossibleMoves(stones, myStones)
+    
     const movesWithScores = getMoveScore(stones, myteam, moves, scoreTemplate)
 
     return (movesWithScores)
@@ -113,20 +115,15 @@ function getMoveScore(stones: number[][], myteam: number, moves: stoneMove[], sc
         var afterBeating = checkBeating(stonesAfterMove, myteam, moves[i].to)
 
         // default value of move: 0
-        if (afterBeating === 2) {
-            // team 2 has won
+        if (!Array.isArray(afterBeating)) {
+            // a team has won!
             ret[i].scoreAfterMove = scoreTemplate.gameWon
-        } else if (Array.isArray(afterBeating)) {
-            const team1HasWon = isKingInCorner(afterBeating)
-            if(team1HasWon) {
-                ret[i].scoreAfterMove = scoreTemplate.gameWon
-            } else {
-                // to see if we beat an opponent figure, calculate sum of stones on board
-                // if the sum got smaller, we apparanently beat someone
-                var gameValueAfterMove = getBoardValue(afterBeating)
-                if (gameValueAfterMove < gameValueBeforeMove) ret[i].scoreAfterMove = scoreTemplate.stoneBeaten
-                ret[i].stonesAfterMove = afterBeating
-            }
+        } else {
+            // to see if we beat an opponent figure, calculate sum of stones on board
+            // if the sum got smaller, we apparanently beat someone
+            var gameValueAfterMove = getBoardValue(afterBeating)
+            if (gameValueAfterMove < gameValueBeforeMove) ret[i].scoreAfterMove = scoreTemplate.stoneBeaten
+            ret[i].stonesAfterMove = afterBeating
         }
     }
 
@@ -151,7 +148,7 @@ function getAllPossibleMoves(stones: number[][], myStones: Stone[]): stoneMove[]
                 col: item.col,
                 value: stones[item.row][item.col]
             }))
-
+        
         var movesForThisStone: stoneMove[] = possibleTargetStones.map(
             (item): stoneMove => ({
                 from: myStones[i],

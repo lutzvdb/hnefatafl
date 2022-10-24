@@ -17,6 +17,8 @@ export function isKingInCorner(stones: number[][]) {
 
 export function checkBeating(stones: number[][], whichTeamIsOn: number, newStone: Stone) {
     const kingPos: Stone = getKingPos(stones)
+
+    if(isKingInCorner(stones)) return(1)
     
     var afterBeating: number[][] | number
     afterBeating = checkSimpleBeating(stones, whichTeamIsOn, newStone)
@@ -29,7 +31,7 @@ export function checkBeating(stones: number[][], whichTeamIsOn: number, newStone
 }
 
 function getKingPos(stones: number[][]) {
-    var kingPos: Stone = { row: 4, col: 4 } // Default
+    var kingPos: Stone = { row: -1, col: -1 } // Default
 
     stones.map((r, rid) => r.map((i, cid) => {
         if (i == 3) kingPos = { row: rid, col: cid }
@@ -44,6 +46,7 @@ function checkKingThreeSidesAndThrone(stones: number[][] | number, kingPos: Ston
     
     // above throne
     if (kingPos.row == (stones.length - 1) / 2 - 1 &&
+        kingPos.col == (stones.length - 1) / 2 &&
         stones[kingPos.row - 1][kingPos.col] == 2 &&
         stones[kingPos.row][kingPos.col - 1] == 2 &&
         stones[kingPos.row][kingPos.col + 1] == 2) {
@@ -52,6 +55,7 @@ function checkKingThreeSidesAndThrone(stones: number[][] | number, kingPos: Ston
 
     // below throne
     if (kingPos.row == (stones.length - 1) / 2 + 1 &&
+        kingPos.col == (stones.length - 1) / 2 &&
         stones[kingPos.row + 1][kingPos.col] == 2 &&
         stones[kingPos.row][kingPos.col - 1] == 2 &&
         stones[kingPos.row][kingPos.col + 1] == 2) {
@@ -60,6 +64,7 @@ function checkKingThreeSidesAndThrone(stones: number[][] | number, kingPos: Ston
 
     // left of throne
     if (kingPos.col == (stones.length - 1) / 2 - 1 &&
+        kingPos.row == (stones.length - 1) / 2 &&
         stones[kingPos.row - 1][kingPos.col] == 2 &&
         stones[kingPos.row + 1][kingPos.col] == 2 &&
         stones[kingPos.row][kingPos.col - 1] == 2) {
@@ -68,6 +73,7 @@ function checkKingThreeSidesAndThrone(stones: number[][] | number, kingPos: Ston
 
     // right of throne
     if (kingPos.col == (stones.length - 1) / 2 + 1 &&
+        kingPos.row == (stones.length - 1) / 2 &&
         stones[kingPos.row - 1][kingPos.col] == 2 &&
         stones[kingPos.row + 1][kingPos.col] == 2 &&
         stones[kingPos.row][kingPos.col + 1] == 2) {

@@ -18,6 +18,7 @@ export default function Game(props: {
     const [selectedStone, setSelectedStone] = useState<Stone | null>(null)
     const [visibleStones, setVisibleStones] = useState(defaultStones)
     const [actualStones, setActualStones] = useState(defaultStones)
+    const [initialStones, setInitialStones] = useState(defaultStones)
     const [validPathInSelection, setValidPathInSelection] = useState(false)
     const [whichTeamIsOn, setWhichTeamIsOn] = useState(2)
     const [winnerTeam, setWinnerTeam] = useState<number | null>(null)
@@ -45,11 +46,13 @@ export default function Game(props: {
         if (newgame === undefined) return
 
         setActualStones(newgame.stones)
+        setInitialStones(newgame.stones)
         setVisibleStones(newgame.stones)
         setWhichTeamIsOn(newgame.whichTeamIsOn)
         setShowMenu(false)
         setSnackbarMessage('Game "' + gameName + '" loaded!')
         setSnackbarIsOpen(true)
+        setShowThinkingIndicator(false)
     }
 
     const restartGame = (stones: number[][], isAIgame: boolean, myTeam: number) => {
@@ -62,9 +65,11 @@ export default function Game(props: {
         setSelectedStone(null)
         setActualStones(stones)
         setVisibleStones(stones)
+        setInitialStones(stones)
         setValidPathInSelection(false)
         setWhichTeamIsOn(2)
         setWinnerTeam(null)
+        setShowThinkingIndicator(false)
 
         if (isAIgame && myTeam == 1) {
             // AI starts!
@@ -239,7 +244,7 @@ export default function Game(props: {
                         {winnerTeam == 2 ? 'RED' : 'GREEN'} has won!
                     </p>
                     <p className="my-20">
-                        <a href="#" onClick={() => restartGame(defaultStones, AImatch, myteam[0])}>Restart game</a>
+                        <a href="#" onClick={() => restartGame(initialStones, AImatch, myteam[0])}>Restart game</a>
                     </p>
                 </div>
             </div>
