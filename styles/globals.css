@@ -6,3 +6,5 @@ body {
     font-family: Nabla, sans-serif;
     background-color: rgba(0, 0, 255, 0.01)
 }
+
+html, body {margin: 0; height: 100%; overflow: hidden}

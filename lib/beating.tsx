@@ -1,6 +1,6 @@
 import { Stone } from './stone'
 
-export function checkBeating(stones: number[][], whichTeamIsOn: number, newStone: Stone) {
+export function isKingInCorner(stones: number[][]) {
     const kingPos: Stone = getKingPos(stones)
     if (
         (kingPos.row == 0 && kingPos.col == 0) ||
@@ -9,8 +9,14 @@ export function checkBeating(stones: number[][], whichTeamIsOn: number, newStone
         (kingPos.row == stones.length - 1 && kingPos.col == stones.length - 1)
     ) {
         // king has won!
-        return (stones)
+        return (true)
+    } else {
+        return (false)
     }
+}
+
+export function checkBeating(stones: number[][], whichTeamIsOn: number, newStone: Stone) {
+    const kingPos: Stone = getKingPos(stones)
     
     var afterBeating: number[][] | number
     afterBeating = checkSimpleBeating(stones, whichTeamIsOn, newStone)
@@ -94,7 +100,7 @@ function checkKingFourSides(stones: number[][], kingPos: Stone) {
 // check in all 4 directions if step1 is enemy and step2 is empty throne
 // if so, remove enemy stone
 function checkBeatingWithEmptyThrone(stones: number[][], whichTeamIsOn: number, newStone: Stone) {
-    if (!newStone.value) return (stones)
+    if (newStone.value === null) return (stones)
 
     const enemy = whichTeamIsOn == 1 ? 2 : 1
 
@@ -142,7 +148,7 @@ function checkBeatingWithEmptyThrone(stones: number[][], whichTeamIsOn: number, 
 // check in all 4 directions if step1 is enemy and step2 is corner
 // if so, remove enemy stone
 function checkBeatingWithCorner(stones: number[][], whichTeamIsOn: number, newStone: Stone) {
-    if (!newStone.value) return (stones)
+    if (newStone.value === null) return (stones)
 
     const enemy = whichTeamIsOn == 1 ? 2 : 1
 
@@ -190,7 +196,7 @@ function checkBeatingWithCorner(stones: number[][], whichTeamIsOn: number, newSt
 // check in all 4 directions if step1 is enemy and step2 is friendly
 // if so, remove enemy stone
 function checkSimpleBeating(stones: number[][], whichTeamIsOn: number, newStone: Stone) {
-    if (!newStone.value) return (stones)
+    if (newStone.value === null) return (stones)
 
     const enemy = whichTeamIsOn == 1 ? 2 : 1
     const friendly = whichTeamIsOn

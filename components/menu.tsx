@@ -17,6 +17,8 @@ export default function Menu(props: {
     const [showMainMenu, setShowMainMenu] = useState(true)
     const [allSavedGames, setAllSavedGames] = useState<string[] | null>(null)
     const [newGameName, setNewGameName] = useState('')
+    const [aiGame, setAIgame] = useState(false);
+    const [myTeam, setMyTeam] = useState(1)
 
     useEffect(() => {
         setAllSavedGames(getAllSavedGames())
@@ -25,7 +27,7 @@ export default function Menu(props: {
     const newGame = (stones: number[][]) => {
         setShowRestart(false)
         setShowMainMenu(true);
-        props.restartGame(stones)
+        props.restartGame(stones, aiGame, myTeam)
         props.setShowMenu(false)
     }
 
@@ -48,7 +50,6 @@ export default function Menu(props: {
                             hnefatafl
                         </div>
                         <div className="border-t border-gray-300 w-full mb-5" ></div>
-
 
                         {/* Save games */}
                         <div className={(showSaveGameInput ? '' : 'hidden') +
@@ -138,8 +139,14 @@ export default function Menu(props: {
                         {/* Main menu */}
                         <div className={showMainMenu ? '' : 'hidden'}>
                             <div className="pl-5 text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left" style={{ fontFamily: 'Roboto Mono' }}>
-                                <a href="#" onClick={() => { setShowRestart(!showRestart); setShowMainMenu(false) }}>
-                                    Restart game
+                                <a href="#" onClick={() => { setAIgame(false); setShowRestart(!showRestart); setShowMainMenu(false) }}>
+                                    Play against a friend
+                                </a><br />
+                                <a href="#" onClick={() => { setMyTeam(2); setAIgame(true); setShowRestart(!showRestart); setShowMainMenu(false) }}>
+                                    Play against AI as red
+                                </a><br />
+                                <a href="#" onClick={() => { setMyTeam(1); setAIgame(true); setShowRestart(!showRestart); setShowMainMenu(false) }}>
+                                    Play against AI as green
                                 </a><br />
                                 <a href="#" onClick={() => { setShowSaveGameInput(true); setShowMainMenu(false) }}>
                                     Save Game

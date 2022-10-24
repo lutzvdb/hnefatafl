@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react'
 import { isValidMove } from '../lib/moveValidity'
 import { defaultStones, tablut, hnefatafl, brandubh } from '../lib/initialSetup'
 import { Stone } from '../lib/stone'
-import { moveStone } from '../lib/path'
-import { checkBeating } from '../lib/beating'
+import { getStonesAfterMovement } from '../lib/path'
+import { checkBeating, isKingInCorner } from '../lib/beating'
 import { saveGameToLocalStroage, loadGameFromLocalStroage, savedGame } from '../lib/savegame'
+import { AIGetNextMove } from '../lib/ai/move'
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
@@ -20,11 +21,11 @@ export default function Game(props: {
     const [validPathInSelection, setValidPathInSelection] = useState(false)
     const [whichTeamIsOn, setWhichTeamIsOn] = useState(2)
     const [winnerTeam, setWinnerTeam] = useState<number | null>(null)
-    const [showMenu, setShowMenu] = useState(false)
+    const [showMenu, setShowMenu] = useState(true)
     const [snackbarIsOpen, setSnackbarIsOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState('')
-
-    const myteam = [1, 2]
+    const [myteam, setMyTeam] = useState([2])
+    const [AImatch, setAImatch] = useState(true) // playing against the computer?
 
     const handleSnackbarClose = () => {
         setSnackbarIsOpen(false)
@@ -40,7 +41,7 @@ export default function Game(props: {
 
     const loadGame = (gameName: string) => {
         const newgame: savedGame | undefined = loadGameFromLocalStroage(gameName)
-        if(newgame === undefined) return
+        if (newgame === undefined) return
 
         setActualStones(newgame.stones)
         setVisibleStones(newgame.stones)
@@ -50,17 +51,52 @@ export default function Game(props: {
         setSnackbarIsOpen(true)
     }
 
-    const restartGame = (stones: number[][]) => {
+    const restartGame = (stones: number[][], isAIgame: boolean, myTeam: number) => {
+        setAImatch(isAIgame)
+        if(isAIgame) {
+            setMyTeam([myTeam])
+        } else {
+            setMyTeam([1, 2])
+        }
         setSelectedStone(null)
         setActualStones(stones)
         setVisibleStones(stones)
         setValidPathInSelection(false)
         setWhichTeamIsOn(2)
         setWinnerTeam(null)
+
+        if(isAIgame && myTeam == 1) {
+            // AI starts!
+            generateAImove()
+        }
     }
 
     const handleWin = (whichTeam: number) => {
         setWinnerTeam(whichTeam)
+    }
+
+    const moveStone = (stones: number[][], from: Stone, to: Stone) => {
+        var newStones = getStonesAfterMovement(stones, from, to)
+
+        const afterBeating = checkBeating(newStones, whichTeamIsOn, to)
+        if (afterBeating === 2) {
+            // team 2 (red) won - they beat the king!
+            handleWin(2)
+        } else if (Array.isArray(afterBeating)) {
+            newStones = afterBeating
+        }
+
+        setActualStones(newStones)
+        setVisibleStones(newStones)
+        setValidPathInSelection(false)
+        setSelectedStone(null)
+
+        if (isKingInCorner(newStones)) {
+            handleWin(1)
+        }
+
+        // next player is up!
+        setWhichTeamIsOn(whichTeamIsOn == 1 ? 2 : 1)
     }
 
     const handleStoneClicked = (clickedStone: Stone) => {
@@ -74,38 +110,23 @@ export default function Game(props: {
                 return
             }
 
-            var newStones = moveStone(actualStones, selectedStone, clickedStone)
-            const afterBeating = checkBeating(newStones, whichTeamIsOn, clickedStone)
-            if (afterBeating === 2) {
-                // team 2 (red) won - they beat the king!
-                handleWin(2)
-            } else if (Array.isArray(afterBeating)) {
-                newStones = afterBeating
-            }
-
-            setActualStones(newStones)
-            setVisibleStones(newStones)
-            setValidPathInSelection(false)
-            setSelectedStone(null)
-
-            if (selectedStone.value == 3 &&
-                (
-                    (clickedStone.row == 0 && clickedStone.col == 0) ||
-                    (clickedStone.row == 0 && clickedStone.col == newStones.length - 1) ||
-                    (clickedStone.row == newStones.length - 1 && clickedStone.col == 0) ||
-                    (clickedStone.row == newStones.length - 1 && clickedStone.col == newStones.length - 1)
-                )
-            ) {
-                handleWin(1)
-                return
-            }
-
-            // next player is up!
-            setWhichTeamIsOn(whichTeamIsOn == 1 ? 2 : 1)
+            moveStone(actualStones, selectedStone, clickedStone)
         } else {
+            // we clicked a stone in order to move it!
             if (!clickedStone.value || clickedStone.value <= 0) return
             if (whichTeamIsOn == clickedStone.value ||
                 (whichTeamIsOn == 1 && clickedStone.value == 3)) {
+                // check if the stone is ours...
+                if (
+                    (
+                        !myteam.includes(2) && (clickedStone.value == 2)
+                    )
+                    ||
+                    (
+                        !myteam.includes(1) && (clickedStone.value == 1 || clickedStone.value == 3)
+                    )
+                ) return // illegally selected stone
+
                 // we selected which stone we want to move
                 setSelectedStone(clickedStone)
             }
@@ -140,15 +161,26 @@ export default function Game(props: {
         }
     }
 
+    const generateAImove = () => {
+        const aiMove = AIGetNextMove(actualStones, whichTeamIsOn)
+        moveStone(actualStones, aiMove.from, aiMove.to)
+    }
+
+    // listen to change in who player is on
     useEffect(() => {
         if (whichTeamIsOn == 1) props.setBgColor(" bg-emerald-50")
         if (whichTeamIsOn == 2) props.setBgColor(" bg-rose-50")
+
+        // if it's an AI match, generate next AI move
+        if (AImatch && !myteam.includes(whichTeamIsOn)) {
+            generateAImove()
+        }
     }, [whichTeamIsOn])
 
     return (
         <>
             <Snackbar
-                anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                 open={snackbarIsOpen}
                 autoHideDuration={2000}
                 onClose={handleSnackbarClose}
