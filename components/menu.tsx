@@ -143,10 +143,10 @@ export default function Menu(props: {
                                     Play against a friend
                                 </a><br />
                                 <a href="#" onClick={() => { setMyTeam(2); setAIgame(true); setShowRestart(!showRestart); setShowMainMenu(false) }}>
-                                    Play against AI as red
+                                    Play against (a stupid) AI as red
                                 </a><br />
                                 <a href="#" onClick={() => { setMyTeam(1); setAIgame(true); setShowRestart(!showRestart); setShowMainMenu(false) }}>
-                                    Play against AI as green
+                                    Play against (a stupid) AI as green
                                 </a><br />
                                 <a href="#" onClick={() => { setShowSaveGameInput(true); setShowMainMenu(false) }}>
                                     Save Game
