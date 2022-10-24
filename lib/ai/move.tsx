@@ -14,32 +14,96 @@ interface stoneMoveWithScore extends stoneMove {
     stonesAfterMove: number[][]
 }
 
-export function AIGetNextMove(stones: number[][], AIteam: number) {
+// a trajectory consists of a series of moves
+interface trajectory {
+    moves: stoneMoveWithScore[],
+    whichTeamIsOn: number
+}
+
+interface trajectoryWithTotalScore extends trajectory {
+    totalScore: number
+}
+
+interface scoreTemplate {
+    uneventful: number,
+    stoneBeaten: number, 
+    gameWon: number
+}
+
+export function AIGetNextMove(stones: number[][], AIteam: number): stoneMoveWithScore {
     // Plan is:
     // 1. Get all available moves
     // 2. Get all available subsequent moves to level N
     // 3. Get move sequence with best total score
     // 4. Supply that move back
 
-    const myStones = getAllMyStones(stones, AIteam)
-    const moves = getAllPossibleMoves(stones, myStones)
-    const movesWithScores = getMoveScore(stones, AIteam, moves)
+    const depth = 2;
+    const scoreTemplateForAI: scoreTemplate = {
+        uneventful: 0,
+        stoneBeaten: 10,
+        gameWon: 999
+    }
+    const scoreTemplateForOpponent: scoreTemplate = {
+        uneventful: 1,
+        stoneBeaten: -20,
+        gameWon: -999
+    }
+    const initialMoves = getAllMovesForSituation(stones, AIteam, scoreTemplateForAI)
+    var currentTeam = AIteam
+    var trajectories: trajectory[] = initialMoves.map((i): trajectory => ({moves: [i], whichTeamIsOn: currentTeam == 1 ? 2 : 1}))
+    
+    for(var d = 0; d < depth; d++) {
+        var newtrajectories: trajectory[] = []
+        var currentTeam = currentTeam == 1 ? 2 : 1
+        // go through all existing trajectories and calculate next steps
+        for(var i = 0; i < trajectories.length; i++) {
+            // generate all moves based on this trajectory and append to new list of trajectories
+            var movesSoFar = trajectories[i].moves
+            var nextSteps = getAllMovesForSituation(
+                movesSoFar[movesSoFar.length-1].stonesAfterMove, 
+                trajectories[i].whichTeamIsOn,
+                currentTeam == AIteam ? scoreTemplateForAI : scoreTemplateForOpponent)
 
-    // get optimal move
-    const bestOutcomeMove = movesWithScores.reduce(
+            // add all resulting trajectories to list
+            var movesFromThisTrajectory: trajectory[] = nextSteps.map(singlestep => ({
+                moves: movesSoFar.concat(singlestep),
+                whichTeamIsOn: currentTeam == 1 ? 2 : 1 
+            }))
+
+            newtrajectories = newtrajectories.concat(movesFromThisTrajectory)
+        }
+
+        trajectories = newtrajectories
+    }
+
+    // get optimal trajectory
+    const trajWithScore: trajectoryWithTotalScore[] = trajectories.map(t => ({
+        ...t,
+        totalScore: t.moves.map(i => i.scoreAfterMove).reduce((curSum, item) => curSum + item)
+    }))
+    
+    const bestOutcomeTrajectory = trajWithScore.reduce(
         (curMax, curVal) => (
-            curVal.scoreAfterMove >= curMax.scoreAfterMove ? curVal : curMax
+            curVal.totalScore >= curMax.totalScore ? curVal : curMax
         )
     )
 
-    return (bestOutcomeMove)
+    return (bestOutcomeTrajectory.moves[0])
 }
 
-function getMoveScore(stones: number[][], myteam: number, moves: stoneMove[]): stoneMoveWithScore[] {
-    // get a score for the result of each move
-    // Beat a stone: 10 points
-    // Win the game: 999 points
+// gets the all possible moves with scores for a given situation
+function getAllMovesForSituation(stones: number[][], myteam: number, scoreTemplate: scoreTemplate) {
+    const myStones = getAllMyStones(stones, myteam)
+    const moves = getAllPossibleMoves(stones, myStones)
+    const movesWithScores = getMoveScore(stones, myteam, moves, scoreTemplate)
 
+    return (movesWithScores)
+}
+
+function getMoveScore(stones: number[][], myteam: number, moves: stoneMove[], scoreTemplate: scoreTemplate): stoneMoveWithScore[] {
+    // get a score for the result of each move
+    // scoreTemplate provides the scores
+    
     // initialize return array... we'll change values in the loop below
     var ret: stoneMoveWithScore[] = moves.map(m => ({ from: m.from, to: m.to, scoreAfterMove: 0, stonesAfterMove: stones }))
 
@@ -51,13 +115,18 @@ function getMoveScore(stones: number[][], myteam: number, moves: stoneMove[]): s
         // default value of move: 0
         if (afterBeating === 2) {
             // team 2 has won
-            ret[i].scoreAfterMove = 999
+            ret[i].scoreAfterMove = scoreTemplate.gameWon
         } else if (Array.isArray(afterBeating)) {
-            // to see if we beat an opponent figure, calculate sum of stones on board
-            // if the sum got smaller, we apparanently beat someone
-            var gameValueAfterMove = getBoardValue(afterBeating)
-            if (gameValueAfterMove < gameValueBeforeMove) ret[i].scoreAfterMove = 10
-            ret[i].stonesAfterMove = afterBeating
+            const team1HasWon = isKingInCorner(afterBeating)
+            if(team1HasWon) {
+                ret[i].scoreAfterMove = scoreTemplate.gameWon
+            } else {
+                // to see if we beat an opponent figure, calculate sum of stones on board
+                // if the sum got smaller, we apparanently beat someone
+                var gameValueAfterMove = getBoardValue(afterBeating)
+                if (gameValueAfterMove < gameValueBeforeMove) ret[i].scoreAfterMove = scoreTemplate.stoneBeaten
+                ret[i].stonesAfterMove = afterBeating
+            }
         }
     }
 

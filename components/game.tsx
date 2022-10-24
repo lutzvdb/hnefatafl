@@ -21,11 +21,12 @@ export default function Game(props: {
     const [validPathInSelection, setValidPathInSelection] = useState(false)
     const [whichTeamIsOn, setWhichTeamIsOn] = useState(2)
     const [winnerTeam, setWinnerTeam] = useState<number | null>(null)
-    const [showMenu, setShowMenu] = useState(true)
+    const [showMenu, setShowMenu] = useState(false)
     const [snackbarIsOpen, setSnackbarIsOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState('')
     const [myteam, setMyTeam] = useState([2])
     const [AImatch, setAImatch] = useState(true) // playing against the computer?
+    const [showThinkingIndicator, setShowThinkingIndicator] = useState(false)
 
     const handleSnackbarClose = () => {
         setSnackbarIsOpen(false)
@@ -53,7 +54,7 @@ export default function Game(props: {
 
     const restartGame = (stones: number[][], isAIgame: boolean, myTeam: number) => {
         setAImatch(isAIgame)
-        if(isAIgame) {
+        if (isAIgame) {
             setMyTeam([myTeam])
         } else {
             setMyTeam([1, 2])
@@ -65,7 +66,7 @@ export default function Game(props: {
         setWhichTeamIsOn(2)
         setWinnerTeam(null)
 
-        if(isAIgame && myTeam == 1) {
+        if (isAIgame && myTeam == 1) {
             // AI starts!
             generateAImove()
         }
@@ -161,9 +162,14 @@ export default function Game(props: {
         }
     }
 
-    const generateAImove = () => {
-        const aiMove = AIGetNextMove(actualStones, whichTeamIsOn)
-        moveStone(actualStones, aiMove.from, aiMove.to)
+    const generateAImove = async () => {
+        setShowThinkingIndicator(true)
+        // small timeout to allow for finishing of rendering
+        setTimeout(() => {
+            const aiMove = AIGetNextMove(actualStones, whichTeamIsOn)
+            moveStone(actualStones, aiMove.from, aiMove.to)
+            setShowThinkingIndicator(false)
+        }, 200)
     }
 
     // listen to change in who player is on
@@ -199,16 +205,14 @@ export default function Game(props: {
             <div className={`text-6xl lg:text-8xl xl:text-8xl 2xl:text-8xl text-center pt-5
                             bg-gradient-to-b from-white ` + (whichTeamIsOn == 1 ? 'bg-emerald-50' : 'bg-rose-50')} >
                 <a href="#" onClick={() => setShowMenu(true)}>
-                    hnefatafl
+                    h n e f a t a f l
                 </a>
             </div>
-            <div className="grid place-content-center mt-5">
-                <div className="aspect-square  
-              p-3 md:p-5 lg:p-5 xl:p-5 2xl:p-5
-      " style={{
-                        width: '100vh',
-                        maxWidth: 'min(100vw, 800px)'
-                    }}>
+            <div className={"grid place-content-center mt-5 duration-200 " + (showThinkingIndicator ? ' opacity-50' : '')}>
+                <div className="aspect-square p-3 md:p-5 lg:p-5 xl:p-5 2xl:p-5" style={{
+                    width: '100vh',
+                    maxWidth: 'min(100vw, 800px)'
+                }}>
                     <Board
                         stones={visibleStones}
                         myteam={myteam}
