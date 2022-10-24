@@ -18,7 +18,7 @@ export function AIGetNextMove(stones: number[][], AIteam: number) {
     // Plan is:
     // 1. Get all available moves
     // 2. Get all available subsequent moves to level N
-    // 3. Get move sequence with best average consequence
+    // 3. Get move sequence with best total score
     // 4. Supply that move back
 
     const myStones = getAllMyStones(stones, AIteam)

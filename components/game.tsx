@@ -235,7 +235,7 @@ export default function Game(props: {
                         {winnerTeam == 2 ? 'RED' : 'GREEN'} has won!
                     </p>
                     <p className="my-20">
-                        <a href="#" onClick={() => restartGame(defaultStones)}>Restart game</a>
+                        <a href="#" onClick={() => restartGame(defaultStones, AImatch, myteam[0])}>Restart game</a>
                     </p>
                 </div>
             </div>
