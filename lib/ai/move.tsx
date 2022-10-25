@@ -62,7 +62,7 @@ export function AIGetNextMove(stones: number[][], AIteam: number): stoneMoveWith
     var trajectories: hierarchicalTrajectory[] = initialMoves
         .map((i): hierarchicalTrajectory => ({ move: i, curDepth: 0, whichTeamIsOn: currentTeam == 1 ? 2 : 1 }))
 
-    trajectories = recursiveMoveTesting(trajectories, 1, 4,
+    trajectories = recursiveMoveTesting(trajectories, 1, 3,
         AIteam, scoreTemplateForAI, scoreTemplateForOpponent)
 
     const trajScores = trajectories.map(t => recursiveScoreSum(t))
