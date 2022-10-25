@@ -30,7 +30,7 @@ export function checkBeating(stones: number[][], whichTeamIsOn: number, newStone
     return (afterBeating)
 }
 
-function getKingPos(stones: number[][]) {
+export function getKingPos(stones: number[][]) {
     var kingPos: Stone = { row: -1, col: -1 } // Default
 
     stones.map((r, rid) => r.map((i, cid) => {

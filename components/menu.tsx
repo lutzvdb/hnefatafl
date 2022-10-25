@@ -27,7 +27,7 @@ export default function Menu(props: {
     const newGame = (stones: number[][]) => {
         setShowRestart(false)
         setShowMainMenu(true);
-        props.restartGame(stones, aiGame, myTeam)
+        props.restartGame(stones, aiGame, myTeam, false)
         props.setShowMenu(false)
     }
 

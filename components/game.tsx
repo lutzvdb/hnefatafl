@@ -56,7 +56,7 @@ export default function Game(props: {
         setShowThinkingIndicator(false)
     }
 
-    const restartGame = (stones: number[][], isAIgame: boolean, myTeam: number) => {
+    const restartGame = (stones: number[][], isAIgame: boolean, myTeam: number, isRestart: boolean) => {
         setAImatch(isAIgame)
         if (isAIgame) {
             setMyTeam([myTeam])
@@ -66,15 +66,15 @@ export default function Game(props: {
         setSelectedStone(null)
         setActualStones(stones)
         setVisibleStones(stones)
-        setInitialStones(stones)
+        if(!isRestart) setInitialStones(stones)
         setValidPathInSelection(false)
-        setWhichTeamIsOn(2)
         setWinnerTeam(null)
         setShowThinkingIndicator(false)
+        setWhichTeamIsOn(2)
 
         if (isAIgame && myTeam == 1) {
             // AI starts!
-            generateAImove()
+            generateAImove(stones, 2)
         }
     }
 
@@ -168,16 +168,16 @@ export default function Game(props: {
         }
     }
 
-    const generateAImove = () => {
+    const generateAImove = (stones: number[][], curTeam: number) => {
         setShowThinkingIndicator(true)
         // small timeout to allow for finishing of rendering
         setTimeout(() => {
-            const aiMove = AIGetNextMove(actualStones, whichTeamIsOn)
+            const aiMove = AIGetNextMove(stones, curTeam)
             if(aiMove === false) {
-                // AI gave up! 
+                // AI gave up!
                 handleWin(myteam[0])
             } else if(typeof(aiMove) != "boolean") {
-                moveStone(actualStones, aiMove.from, aiMove.to)
+                moveStone(stones, aiMove.from, aiMove.to)
                 setShowThinkingIndicator(false)
             }
         }, 200)
@@ -185,12 +185,13 @@ export default function Game(props: {
 
     // listen to change in who player is on
     useEffect(() => {
+        if (winnerTeam !== null) return // if the game is already over, no need to do anything
         if (whichTeamIsOn == 1) props.setBgColor(" bg-emerald-50")
         if (whichTeamIsOn == 2) props.setBgColor(" bg-rose-50")
 
         // if it's an AI match, generate next AI move
         if (AImatch && !myteam.includes(whichTeamIsOn)) {
-            generateAImove()
+            generateAImove(actualStones, whichTeamIsOn)
         }
     }, [whichTeamIsOn])
 
@@ -250,7 +251,7 @@ export default function Game(props: {
                         {winnerTeam == 2 ? 'RED' : 'GREEN'} has won!
                     </p>
                     <p className="my-20">
-                        <a href="#" onClick={() => restartGame(initialStones, AImatch, myteam[0])}>Restart game</a>
+                        <a href="#" onClick={() => restartGame(initialStones, AImatch, myteam[0], true)}>Restart game</a>
                     </p>
                 </div>
             </div>

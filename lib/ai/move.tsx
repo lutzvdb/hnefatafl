@@ -1,7 +1,7 @@
 import { Stone } from '../stone'
 import { getAllMyStones } from '../stone'
 import { isValidMove } from '../moveValidity'
-import { checkBeating, isKingInCorner } from '../beating'
+import { checkBeating, getKingPos } from '../beating'
 import { getStonesAfterMovement } from '../path'
 
 interface stoneMove {
@@ -24,7 +24,8 @@ interface hierarchicalTrajectory {
 interface scoreTemplate {
     uneventful: number,
     stoneBeaten: number,
-    gameWon: number
+    gameWon: number,
+    kingDistanceFromCenter: number // factor: for each stone moved from center, this is added to the score
 }
 
 export function AIGetNextMove(stones: number[][], AIteam: number): stoneMoveWithScore | boolean {
@@ -37,12 +38,14 @@ export function AIGetNextMove(stones: number[][], AIteam: number): stoneMoveWith
     const scoreTemplateForAI: scoreTemplate = {
         uneventful: 0,
         stoneBeaten: 200,
-        gameWon: 10000
+        gameWon: 10000,
+        kingDistanceFromCenter: 50
     }
     const scoreTemplateForOpponent: scoreTemplate = {
         uneventful: 0,
         stoneBeaten: -100,
-        gameWon: -500
+        gameWon: -10000,
+        kingDistanceFromCenter: 0
     }
     const initialMoves = getAllMovesForSituation(stones, AIteam, scoreTemplateForAI, 1)
 
@@ -53,7 +56,7 @@ export function AIGetNextMove(stones: number[][], AIteam: number): stoneMoveWith
     }
 
     // can i win within 1 move?
-    const directWinTraj = initialMoves.filter(i => i.scoreAfterMove == 1000)
+    const directWinTraj = initialMoves.filter(i => i.scoreAfterMove == scoreTemplateForAI.gameWon)
     if (directWinTraj.length > 0) {
         return (directWinTraj[0])
     }
@@ -68,8 +71,6 @@ export function AIGetNextMove(stones: number[][], AIteam: number): stoneMoveWith
     const trajScores = trajectories.map(t => recursiveScoreSum(t))
     const bestScore = Math.max(...trajScores)
     const chosenTraj = trajScores.indexOf(bestScore)
-
-    console.log(trajectories)
 
     return (initialMoves[chosenTraj])
 }
@@ -142,7 +143,6 @@ function getAllMovesForSituation
     ) {
     const myStones = getAllMyStones(stones, myteam)
     const moves = getAllPossibleMoves(stones, myStones, drawingChance)
-    //moves = filterMoves(moves, drawingChance)
     const movesWithScores = getMoveScore(stones, myteam, moves, scoreTemplate)
 
     return (movesWithScores)
@@ -184,6 +184,19 @@ function getMoveScore(stones: number[][], myteam: number, moves: stoneMove[], sc
             var gameValueAfterMove = getBoardValue(afterBeating)
             if (gameValueAfterMove < gameValueBeforeMove) ret[i].scoreAfterMove = scoreTemplate.stoneBeaten
             ret[i].stonesAfterMove = afterBeating
+
+            // check for king position
+            const kingPos: Stone = getKingPos(afterBeating)
+            if(kingPos.col != 3 || kingPos.row != 3) {
+                const dist = (
+                    // col
+                    Math.abs(kingPos.col - (stones.length - 1) / 2)
+                    +
+                    // row
+                    Math.abs(kingPos.row - (stones.length - 1) / 2)
+                )
+                ret[i].scoreAfterMove += dist * scoreTemplate.kingDistanceFromCenter
+            }
         }
     }
 
@@ -199,21 +212,20 @@ function getAllPossibleMoves(stones: number[][], myStones: Stone[], drawingChanc
     const boardLength: Number[] = Array.from({ length: stones.length }, (x, i) => i)
     var allMoves: stoneMove[] = []
 
-    const considerForMoving = filterMoves(myStones, drawingChance)
-
-    for (var i = 0; i < considerForMoving.length; i++) {
-        var horizontalMoves = boardLength.map((item): Stone => ({ row: item.valueOf(), col: considerForMoving[i].col }))
-        var verticalMoves = boardLength.map((item): Stone => ({ row: considerForMoving[i].row, col: item.valueOf() }))
+    for (var i = 0; i < myStones.length; i++) {
+        var horizontalMoves = boardLength.map((item): Stone => ({ row: item.valueOf(), col: myStones[i].col }))
+        var verticalMoves = boardLength.map((item): Stone => ({ row: myStones[i].row, col: item.valueOf() }))
         var possibleTargetStones: Stone[] = horizontalMoves.concat(verticalMoves)
             .map(item => ({
                 row: item.row,
                 col: item.col,
                 value: stones[item.row][item.col]
             }))
+        possibleTargetStones = filterMoves(possibleTargetStones, drawingChance)
 
         var movesForThisStone: stoneMove[] = possibleTargetStones.map(
             (item): stoneMove => ({
-                from: considerForMoving[i],
+                from: myStones[i],
                 to: item
             })
         )
