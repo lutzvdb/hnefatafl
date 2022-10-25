@@ -15,6 +15,7 @@ import Alert from '@mui/material/Alert';
 export default function Game(props: {
     setBgColor: Function
 }) {
+    const isDev = process.env.NODE_ENV === 'development'
     const [selectedStone, setSelectedStone] = useState<Stone | null>(null)
     const [visibleStones, setVisibleStones] = useState(defaultStones)
     const [actualStones, setActualStones] = useState(defaultStones)
@@ -22,12 +23,12 @@ export default function Game(props: {
     const [validPathInSelection, setValidPathInSelection] = useState(false)
     const [whichTeamIsOn, setWhichTeamIsOn] = useState(2)
     const [winnerTeam, setWinnerTeam] = useState<number | null>(null)
-    const [showMenu, setShowMenu] = useState(true)
     const [snackbarIsOpen, setSnackbarIsOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState('')
     const [myteam, setMyTeam] = useState([2])
     const [AImatch, setAImatch] = useState(true) // playing against the computer?
     const [showThinkingIndicator, setShowThinkingIndicator] = useState(false)
+    const [showMenu, setShowMenu] = useState(isDev ? false : true)
 
     const handleSnackbarClose = () => {
         setSnackbarIsOpen(false)
@@ -167,13 +168,18 @@ export default function Game(props: {
         }
     }
 
-    const generateAImove = async () => {
+    const generateAImove = () => {
         setShowThinkingIndicator(true)
         // small timeout to allow for finishing of rendering
         setTimeout(() => {
             const aiMove = AIGetNextMove(actualStones, whichTeamIsOn)
-            moveStone(actualStones, aiMove.from, aiMove.to)
-            setShowThinkingIndicator(false)
+            if(aiMove === false) {
+                // AI gave up! 
+                handleWin(myteam[0])
+            } else if(typeof(aiMove) != "boolean") {
+                moveStone(actualStones, aiMove.from, aiMove.to)
+                setShowThinkingIndicator(false)
+            }
         }, 200)
     }
 

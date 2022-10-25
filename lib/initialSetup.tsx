@@ -81,4 +81,4 @@ export const aleaEvangelii = [
   [0,0,2,0,0,2,0,0,0,0,0,0,0,2,0,0,2,0,0]
 ]
 
-export const defaultStones = tablut 
+export const defaultStones = brandubh 
