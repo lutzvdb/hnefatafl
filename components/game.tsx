@@ -125,7 +125,7 @@ export default function Game(props: {
             setWhichTeamIsOn(2) // red begins
             setOpponentName(opponent)
         }
-    }
+    } 
 
     // hook to handle updates from DB
     useEffect(() => {
