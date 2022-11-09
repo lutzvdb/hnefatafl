@@ -1,6 +1,8 @@
 import { tablut, hnefatafl, brandubh, ardri, tawlbwrdd, aleaEvangelii } from '../lib/initialSetup'
 import { useEffect, useState } from 'react'
 import { getAllSavedGames } from '../lib/savegame'
+import MultiplayerMenu from './MultiplayerMenu'
+import { stonesByName } from '../lib/initialSetup'
 
 import TextField from '@mui/material/TextField';
 
@@ -10,11 +12,13 @@ export default function Menu(props: {
     setShowMenu: Function,
     saveGame: Function,
     loadGame: Function
+    setOpponentName: Function
 }) {
     const [showSaveGameInput, setShowSaveGameInput] = useState(false)
     const [showLoadGame, setShowLoadGame] = useState(false)
     const [showRestart, setShowRestart] = useState(false)
     const [showMainMenu, setShowMainMenu] = useState(true)
+    const [showMultiplayer, setShowMultiplayer] = useState(false)
     const [allSavedGames, setAllSavedGames] = useState<string[] | null>(null)
     const [newGameName, setNewGameName] = useState('')
     const [aiGame, setAIgame] = useState(false);
@@ -25,10 +29,27 @@ export default function Menu(props: {
     }, [showMainMenu])
 
     const newGame = (stones: number[][]) => {
+        // reset menu for next opening
         setShowRestart(false)
         setShowMainMenu(true);
-        props.restartGame(stones, aiGame, myTeam, false)
+
+        // start game
+        props.restartGame(stones, aiGame, myTeam, false, null)
         props.setShowMenu(false)
+        props.setOpponentName(null)
+    }
+
+    const startOnlineGame = async (gameId: string, stones: number[][], myTeam: number, opponentName: string) => {
+        // reset menu for next opening
+        setShowMainMenu(true);
+        setShowMultiplayer(false);
+
+        console.log('Starting online game ' + gameId)
+
+        // start game
+        props.setOpponentName(opponentName)
+        props.setShowMenu(false)
+        props.restartGame(stones, false, myTeam, false, gameId)
     }
 
     return (
@@ -112,27 +133,25 @@ export default function Menu(props: {
                             ' pl-5 text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left'}
                             style={{ fontFamily: 'Roboto Mono' }}
                         >
-                            <a href="#" onClick={() => newGame(brandubh)}>
-                                - Brandubh (7x7)
-                            </a><br />
-                            <a href="#" onClick={() => newGame(ardri)}>
-                                - Ard Ri (7x7)
-                            </a><br />
-                            <a href="#" onClick={() => newGame(tablut)}>
-                                - Tablut (9x9)
-                            </a><br />
-                            <a href="#" onClick={() => newGame(hnefatafl)}>
-                                - Hnefatafl (11x11)
-                            </a><br />
-                            <a href="#" onClick={() => newGame(tawlbwrdd)}>
-                                - Tawlbwrdd (11x11)
-                            </a><br />
-                            <a href="#" onClick={() => newGame(aleaEvangelii)}>
-                                - Alea Evangelii (19x19)
-                            </a>
-                            <br /><br />
+                            {stonesByName.map(s => 
+                                <a key={s.name} href="#" onClick={() => newGame(s.stones)}>
+                                    - {s.formalName}<br />
+                                </a>
+                            )}
+                            <br />
                             <a href="#" onClick={() => { setShowRestart(false); setShowMainMenu(true); }}>
                                 Back...
+                            </a>
+                        </div>
+
+                        {/* Multiplayer menu */}
+                        <div className={(showMultiplayer ? '' : 'hidden') +
+                            ' pl-5 text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left'}
+                            style={{ fontFamily: 'Roboto Mono' }}
+                        >
+                            <MultiplayerMenu startOnlineGame={startOnlineGame} />
+                            <a href="#" onClick={() => { setShowMultiplayer(false); setShowMainMenu(true); }}>
+                                Back to main menu
                             </a>
                         </div>
 
@@ -140,7 +159,10 @@ export default function Menu(props: {
                         <div className={showMainMenu ? '' : 'hidden'}>
                             <div className="pl-5 text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left" style={{ fontFamily: 'Roboto Mono' }}>
                                 <a href="#" onClick={() => { setAIgame(false); setShowRestart(!showRestart); setShowMainMenu(false) }}>
-                                    Play against a friend
+                                    Play against a (local) friend
+                                </a><br />
+                                <a href="#" onClick={() => { setShowMultiplayer(true); setShowMainMenu(false) }}>
+                                    Play online
                                 </a><br />
                                 <a href="#" onClick={() => { setMyTeam(2); setAIgame(true); setShowRestart(!showRestart); setShowMainMenu(false) }}>
                                     Play against (a stupid) AI as red

@@ -2,15 +2,17 @@ import Board from '../components/board'
 import Menu from '../components/menu'
 import { useEffect, useState } from 'react'
 import { isValidMove } from '../lib/moveValidity'
-import { defaultStones, tablut, hnefatafl, brandubh } from '../lib/initialSetup'
+import { defaultStones } from '../lib/initialSetup'
 import { Stone } from '../lib/stone'
 import { getStonesAfterMovement } from '../lib/path'
 import { checkBeating, isKingInCorner } from '../lib/beating'
 import { saveGameToLocalStroage, loadGameFromLocalStroage, savedGame } from '../lib/savegame'
 import { AIGetNextMove } from '../lib/ai/move'
+import { useMultiplayerListener } from '../hooks/useMultiplayerListener'
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { BSON } from 'realm-web'
 
 export default function Game(props: {
     setBgColor: Function
@@ -27,8 +29,12 @@ export default function Game(props: {
     const [snackbarMessage, setSnackbarMessage] = useState('')
     const [myteam, setMyTeam] = useState([2])
     const [AImatch, setAImatch] = useState(true) // playing against the computer?
+    // onlineGameId: if not null, we're playing online and contains game ID in online DB
+    const [onlineGameId, setOnlineGameId] = useState<string | null>(null)
+    const [opponentName, setOpponentName] = useState<string | null>(null)
     const [showThinkingIndicator, setShowThinkingIndicator] = useState(false)
-    const [showMenu, setShowMenu] = useState(isDev ? false : true)
+    const [showMenu, setShowMenu] = useState(isDev ? true : true)
+    const [latestMultiplayerUpdate, setLatestMultiplayerUpdate] = useState<any | null>(null)
 
     const handleSnackbarClose = () => {
         setSnackbarIsOpen(false)
@@ -56,17 +62,24 @@ export default function Game(props: {
         setShowThinkingIndicator(false)
     }
 
-    const restartGame = (stones: number[][], isAIgame: boolean, myTeam: number, isRestart: boolean) => {
+    const restartGame = async (
+        stones: number[][],
+        isAIgame: boolean,
+        myTeam: number,
+        isRestart: boolean,
+        gameId: string | null
+    ) => {
         setAImatch(isAIgame)
-        if (isAIgame) {
+        if (isAIgame || gameId !== null) {
             setMyTeam([myTeam])
         } else {
+            // we're playing locally, were allowed to move both teams
             setMyTeam([1, 2])
         }
         setSelectedStone(null)
         setActualStones(stones)
         setVisibleStones(stones)
-        if(!isRestart) setInitialStones(stones)
+        if (!isRestart) setInitialStones(stones)
         setValidPathInSelection(false)
         setWinnerTeam(null)
         setShowThinkingIndicator(false)
@@ -76,10 +89,98 @@ export default function Game(props: {
             // AI starts!
             generateAImove(stones, 2)
         }
+
+        if (gameId !== null && myTeam == 1) {
+            // online opponent starts!
+            setShowThinkingIndicator(true)
+        }
+
+        if (gameId) {
+            setOnlineGameId(gameId)
+        }
     }
+
+    const handleMultiplayerMove = (moves: any) => {
+        // we received a move from DB... 
+        const latestMove = moves[moves.length - 1]
+
+        if (latestMove.movingTeam == myteam[0]) return // we received our own move
+
+        // ok, the opponent moved!
+        const fromStone: Stone = { row: latestMove.fromRow, col: latestMove.fromCol, value: actualStones[latestMove.fromRow][latestMove.fromCol] }
+        const toStone: Stone = { row: latestMove.toRow, col: latestMove.toCol, value: actualStones[latestMove.toRow][latestMove.toCol] }
+        // safety check: is move legal?
+
+        if (!isValidMove(actualStones, fromStone, toStone)) return
+        console.log('I received a valid move from the opponent and am moving the stone.')
+        moveStone(actualStones, fromStone, toStone)
+    }
+
+    const handleOpponent = (opponent: string) => {
+        // see if a new opponent joined
+        if (opponentName === "" && (opponent.length > 0)) {
+            console.log('Opponent joined')
+            // yeah, someone joined!
+            if(myteam[0] === 2) setShowThinkingIndicator(false)
+            setWhichTeamIsOn(2) // red begins
+            setOpponentName(opponent)
+        }
+    }
+
+    // hook to handle updates from DB
+    useEffect(() => {
+        if(!latestMultiplayerUpdate) return 
+        const update = latestMultiplayerUpdate
+
+        // we were streamed an update from mongoDB!
+        if (!update) return
+        if (!onlineGameId) return
+
+        // check to see if it is our ID! We may be subscribed to old games...
+        const myId = new BSON.ObjectId(onlineGameId)
+        if (update._id.id.toString() !== myId.id.toString()) return
+
+        // all good!
+        if (update.moves) handleMultiplayerMove(update.moves)
+        if (update.opponent) handleOpponent(update.opponent)
+    }, [latestMultiplayerUpdate])
+
+    useEffect(() => {
+        if (!onlineGameId) return
+        // start listening for opponent moves
+        useMultiplayerListener(onlineGameId, (update: any) => setLatestMultiplayerUpdate(update))
+    }, [onlineGameId])
+
+    useEffect(() => {
+        if (onlineGameId === null) return
+        if (opponentName === "") {
+            // looks like we started a game and are waiting on an opponent... set thinking indicator
+            console.log('Waiting for opponent...')
+            setShowThinkingIndicator(true)
+            setWhichTeamIsOn(-1)
+        }
+    }, [opponentName])
 
     const handleWin = (whichTeam: number) => {
         setWinnerTeam(whichTeam)
+    }
+
+    const sendMoveToServer = (from: Stone, to: Stone) => {
+        // we did a move.. send our move to the server so the opponent can see it
+        if (!onlineGameId) return
+
+        fetch('/api/move', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                gameId: onlineGameId,
+                movingTeam: myteam[0],
+                fromRow: from.row,
+                fromCol: from.col,
+                toRow: to.row,
+                toCol: to.col
+            })
+        })
     }
 
     const moveStone = (stones: number[][], from: Stone, to: Stone) => {
@@ -91,6 +192,17 @@ export default function Game(props: {
             handleWin(2)
         } else if (Array.isArray(afterBeating)) {
             newStones = afterBeating
+        }
+
+        if (onlineGameId && (whichTeamIsOn == myteam[0])) {
+            console.log('Sending my move to the server...')
+            sendMoveToServer(from, to)
+            setShowThinkingIndicator(true)
+        }
+
+        if (onlineGameId && (whichTeamIsOn != myteam[0])) {
+            // opponent made a move!
+            setShowThinkingIndicator(false)
         }
 
         setActualStones(newStones)
@@ -173,10 +285,10 @@ export default function Game(props: {
         // small timeout to allow for finishing of rendering
         setTimeout(() => {
             const aiMove = AIGetNextMove(stones, curTeam)
-            if(aiMove === false) {
+            if (aiMove === false) {
                 // AI gave up!
                 handleWin(myteam[0])
-            } else if(typeof(aiMove) != "boolean") {
+            } else if (typeof (aiMove) != "boolean") {
                 moveStone(stones, aiMove.from, aiMove.to)
                 setShowThinkingIndicator(false)
             }
@@ -213,17 +325,26 @@ export default function Game(props: {
                 restartGame={restartGame}
                 saveGame={(gameName: string) => saveGame(gameName)}
                 loadGame={(gameName: string) => loadGame(gameName)}
+                setOpponentName={setOpponentName}
             />
-            <div className={`text-6xl lg:text-8xl xl:text-8xl 2xl:text-8xl text-center pt-5
+            <div className={`text-6xl lg:text-8xl xl:text-8xl 2xl:text-8xl text-center p-5
                             bg-gradient-to-b from-white ` + (whichTeamIsOn == 1 ? 'bg-emerald-50' : 'bg-rose-50')} >
                 <a href="#" onClick={() => setShowMenu(true)}>
                     hnefatafl
                 </a>
+                {opponentName !== null ?
+                    <div className="mt-4 text-base" style={{ fontFamily: 'Roboto Mono' }}>
+                        {opponentName.length == 0 ? 'Warte auf Gegner...' :
+                            <>
+                                Online-Spiel gegen {opponentName}
+                            </>}
+                    </div>
+                    : ''}
             </div>
             <div className={"grid place-content-center mt-5 duration-200 " + (showThinkingIndicator ? ' opacity-50' : '')}>
-                <div className="aspect-square p-3 md:p-5 lg:p-5 xl:p-5 2xl:p-5" style={{
+                <div className="aspect-square p-3" style={{
                     width: '100vh',
-                    maxWidth: 'min(100vw, 800px)'
+                    maxWidth: 'min(100vw, 650px)'
                 }}>
                     <Board
                         stones={visibleStones}
@@ -251,10 +372,11 @@ export default function Game(props: {
                         {winnerTeam == 2 ? 'RED' : 'GREEN'} has won!
                     </p>
                     <p className="my-20">
-                        <a href="#" onClick={() => restartGame(initialStones, AImatch, myteam[0], true)}>Restart game</a>
+                        <a href="#" onClick={() => restartGame(initialStones, AImatch, myteam[0], true, null)}>Restart game</a>
                     </p>
                 </div>
             </div>
         </>
     )
 }
+

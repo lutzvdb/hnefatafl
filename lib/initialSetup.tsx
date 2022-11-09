@@ -82,3 +82,37 @@ export const aleaEvangelii = [
 ]
 
 export const defaultStones = brandubh 
+
+
+export const stonesByName = [
+    {
+        name: 'brandubh',
+        stones: brandubh,
+        formalName: 'Brandubh (7x7)'
+    },
+    {
+        name: 'ardri',
+        stones: ardri,
+        formalName: 'Ard Ri (7x7)'
+    },
+    {
+        name: 'tablut',
+        stones: tablut,
+        formalName: 'Tablut (9x9)'
+    },
+    {
+        name: 'hnefatafl',
+        stones: hnefatafl,
+        formalName: 'Hnefatafl (11x11)'
+    },
+    {
+        name: 'tawlbwrdd',
+        stones: tawlbwrdd,
+        formalName: 'Tawlbwrdd (11x11)'
+    },
+    {
+        name: 'aleaevangelii',
+        stones: aleaEvangelii,
+        formalName: 'Alea Evangelii (19x19)'
+    }
+]
