@@ -13,6 +13,8 @@ import { useMultiplayerListener } from '../hooks/useMultiplayerListener'
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { BSON } from 'realm-web'
+import MultiplayerListener from './MultiplayerListener'
+import { sendMoveToServer } from '../lib/multiplayer'
 
 export default function Game(props: {
     setBgColor: Function
@@ -40,12 +42,15 @@ export default function Game(props: {
         setSnackbarIsOpen(false)
     }
 
+    const showSnackbar = (text: string) => {
+        setSnackbarMessage(text)
+        setSnackbarIsOpen(true)
+    }
+
     const saveGame = (gameName: string) => {
         saveGameToLocalStroage(gameName, actualStones, whichTeamIsOn)
-
+        showSnackbar('Game saved as "' + gameName + '"!')
         setShowMenu(false)
-        setSnackbarMessage('Game saved as "' + gameName + '"!')
-        setSnackbarIsOpen(true)
     }
 
     const loadGame = (gameName: string) => {
@@ -57,9 +62,10 @@ export default function Game(props: {
         setVisibleStones(newgame.stones)
         setWhichTeamIsOn(newgame.whichTeamIsOn)
         setShowMenu(false)
-        setSnackbarMessage('Game "' + gameName + '" loaded!')
-        setSnackbarIsOpen(true)
+        showSnackbar('Game "' + gameName + '" loaded!')
         setShowThinkingIndicator(false)
+        setOpponentName(null)
+        setOnlineGameId(null)
     }
 
     const restartGame = async (
@@ -83,6 +89,7 @@ export default function Game(props: {
         setValidPathInSelection(false)
         setWinnerTeam(null)
         setShowThinkingIndicator(false)
+        props.setBgColor(" bg-rose-50")
         setWhichTeamIsOn(2)
 
         if (isAIgame && myTeam == 1) {
@@ -95,9 +102,8 @@ export default function Game(props: {
             setShowThinkingIndicator(true)
         }
 
-        if (gameId) {
-            setOnlineGameId(gameId)
-        }
+        if(gameId === null) setOpponentName(null)
+        setOnlineGameId(gameId)
     }
 
     const handleMultiplayerMove = (moves: any) => {
@@ -119,37 +125,23 @@ export default function Game(props: {
     const handleOpponent = (opponent: string) => {
         // see if a new opponent joined
         if (opponentName === "" && (opponent.length > 0)) {
-            console.log('Opponent joined')
             // yeah, someone joined!
+            console.log('Opponent joined')
+            showSnackbar(opponent + ' joined the game!')
             if(myteam[0] === 2) setShowThinkingIndicator(false)
             setWhichTeamIsOn(2) // red begins
             setOpponentName(opponent)
         }
     } 
 
-    // hook to handle updates from DB
+    // hook to handle updates from DB that were streamed
     useEffect(() => {
-        if(!latestMultiplayerUpdate) return 
-        const update = latestMultiplayerUpdate
-
-        // we were streamed an update from mongoDB!
-        if (!update) return
-        if (!onlineGameId) return
-
-        // check to see if it is our ID! We may be subscribed to old games...
-        const myId = new BSON.ObjectId(onlineGameId)
-        if (update._id.id.toString() !== myId.id.toString()) return
+        if(!latestMultiplayerUpdate || !onlineGameId) return 
 
         // all good!
-        if (update.moves) handleMultiplayerMove(update.moves)
-        if (update.opponent) handleOpponent(update.opponent)
+        if (latestMultiplayerUpdate.moves) handleMultiplayerMove(latestMultiplayerUpdate.moves)
+        if (latestMultiplayerUpdate.opponent) handleOpponent(latestMultiplayerUpdate.opponent)
     }, [latestMultiplayerUpdate])
-
-    useEffect(() => {
-        if (!onlineGameId) return
-        // start listening for opponent moves
-        useMultiplayerListener(onlineGameId, (update: any) => setLatestMultiplayerUpdate(update))
-    }, [onlineGameId])
 
     useEffect(() => {
         if (onlineGameId === null) return
@@ -165,24 +157,6 @@ export default function Game(props: {
         setWinnerTeam(whichTeam)
     }
 
-    const sendMoveToServer = (from: Stone, to: Stone) => {
-        // we did a move.. send our move to the server so the opponent can see it
-        if (!onlineGameId) return
-
-        fetch('/api/move', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                gameId: onlineGameId,
-                movingTeam: myteam[0],
-                fromRow: from.row,
-                fromCol: from.col,
-                toRow: to.row,
-                toCol: to.col
-            })
-        })
-    }
-
     const moveStone = (stones: number[][], from: Stone, to: Stone) => {
         var newStones = getStonesAfterMovement(stones, from, to)
 
@@ -196,7 +170,7 @@ export default function Game(props: {
 
         if (onlineGameId && (whichTeamIsOn == myteam[0])) {
             console.log('Sending my move to the server...')
-            sendMoveToServer(from, to)
+            sendMoveToServer(onlineGameId, myteam, from, to)
             setShowThinkingIndicator(true)
         }
 
@@ -212,10 +186,10 @@ export default function Game(props: {
 
         if (isKingInCorner(newStones)) {
             handleWin(1)
+        } else {
+            // next player is up!
+            setWhichTeamIsOn(whichTeamIsOn == 1 ? 2 : 1)
         }
-
-        // next player is up!
-        setWhichTeamIsOn(whichTeamIsOn == 1 ? 2 : 1)
     }
 
     const handleStoneClicked = (clickedStone: Stone) => {
@@ -309,10 +283,11 @@ export default function Game(props: {
 
     return (
         <>
+            <MultiplayerListener onlineGameId={onlineGameId} handleUpdate={setLatestMultiplayerUpdate} />
             <Snackbar
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                 open={snackbarIsOpen}
-                autoHideDuration={2000}
+                autoHideDuration={3000}
                 onClose={handleSnackbarClose}
             >
                 <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
