@@ -1,10 +1,13 @@
-import { tablut, hnefatafl, brandubh, ardri, tawlbwrdd, aleaEvangelii } from '../lib/initialSetup'
+
 import { useEffect, useState } from 'react'
 import { getAllSavedGames } from '../lib/savegame'
 import MultiplayerMenu from './MultiplayerMenu'
 import { stonesByName } from '../lib/initialSetup'
 
 import TextField from '@mui/material/TextField';
+import MenuSection from './MenuSection';
+
+const fontName = 'Raleway'
 
 export default function Menu(props: {
     restartGame: Function,
@@ -71,114 +74,116 @@ export default function Menu(props: {
                             hnefatafl
                         </div>
                         <div className="border-t border-gray-300 w-full mb-5" ></div>
-
-                        {/* Save games */}
-                        <div className={(showSaveGameInput ? '' : 'hidden') +
-                            ' pl-5 text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left'}
-                            style={{ fontFamily: 'Roboto Mono' }}
-                        >
-                            <TextField
-                                label="Choose a game name"
-                                variant="standard"
-                                inputProps={{ style: { fontFamily: 'Roboto Mono' } }}
-                                InputLabelProps={{ style: { fontFamily: 'Roboto Mono' } }}
-                                onChange={(e) => setNewGameName(e.target.value)}
-                                className="mb-5"
-                            />
-                            <br />
-                            <a href="#" onClick={() => { setShowSaveGameInput(false); setShowMainMenu(true); props.saveGame(newGameName) }}>
-                                Save!
-                            </a>
-                            <br /><br />
-                            <a href="#" onClick={() => { setShowSaveGameInput(false); setShowMainMenu(true); }}>
-                                Back...
-                            </a>
-                        </div>
-
-                        {/* Load games */}
-                        <div className={(showLoadGame ? '' : 'hidden') +
-                            ' pl-5 text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left'}
-                            style={{ fontFamily: 'Roboto Mono' }}
-                        >
-                            <ul>
-                                {allSavedGames === null ? <li key="nogames"><i>No games saved.</i></li> :
-                                    allSavedGames.map((g, i) =>
-                                        i <= 9 ?
-                                            <li key={g}>
-                                                <i>
-                                                    {i + 1}.&nbsp;
-                                                    <a href="#" onClick={() => {
-                                                        setShowLoadGame(false);
-                                                        setShowMainMenu(true);
-                                                        props.loadGame(g)
-                                                    }}
-                                                    >
-                                                        {g}
-                                                    </a>
-                                                </i>
-                                                <br />
-                                            </li>
-                                            : ''
-                                    )
-                                }
-                            </ul>
-                            <br />
-                            <a href="#" onClick={() => { setShowLoadGame(false); setShowMainMenu(true); }}>
-                                Back...
-                            </a>
-                        </div>
-
-                        {/* Restart game  */}
-                        <div className={(showRestart ? '' : 'hidden') +
-                            ' pl-5 text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left'}
-                            style={{ fontFamily: 'Roboto Mono' }}
-                        >
-                            {stonesByName.map(s => 
-                                <a key={s.name} href="#" onClick={() => newGame(s.stones)}>
-                                    - {s.formalName}<br />
+                        <div className={"text-base lg:text-lg text-left"} style={{ fontFamily: fontName }}>
+                            {/* Save games */}
+                            <div className={showSaveGameInput ? '' : 'hidden'}>
+                                <MenuSection title="Save your game locally">
+                                    <div>
+                                        <TextField
+                                            label="Choose a game name"
+                                            variant="standard"
+                                            inputProps={{ style: { fontFamily: fontName } }}
+                                            InputLabelProps={{ style: { fontFamily: fontName } }}
+                                            onChange={(e) => setNewGameName(e.target.value)}
+                                            className="mb-5"
+                                        />
+                                    </div>
+                                    <div>
+                                        <a href="#" onClick={() => { setShowSaveGameInput(false); setShowMainMenu(true); props.saveGame(newGameName) }}>
+                                            Save!
+                                        </a>
+                                    </div>
+                                </MenuSection><br />
+                                <a href="#" onClick={() => { setShowSaveGameInput(false); setShowMainMenu(true); }}>
+                                    Back...
                                 </a>
-                            )}
-                            <br />
-                            <a href="#" onClick={() => { setShowRestart(false); setShowMainMenu(true); }}>
-                                Back...
-                            </a>
-                        </div>
+                            </div>
 
-                        {/* Multiplayer menu */}
-                        <div className={(showMultiplayer ? '' : 'hidden') +
-                            ' pl-5 text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left'}
-                            style={{ fontFamily: 'Roboto Mono' }}
-                        >
-                            <MultiplayerMenu startOnlineGame={startOnlineGame} />
-                            <a href="#" onClick={() => { setShowMultiplayer(false); setShowMainMenu(true); }}>
-                                Back to main menu
-                            </a>
-                        </div>
-
-                        {/* Main menu */}
-                        <div className={showMainMenu ? '' : 'hidden'}>
-                            <div className="pl-5 text-lg lg:text-2xl xl:text-2xl 2xl:text-2xl text-left" style={{ fontFamily: 'Roboto Mono' }}>
-                                <a href="#" onClick={() => { setAIgame(false); setShowRestart(!showRestart); setShowMainMenu(false) }}>
-                                    Play against a (local) friend
-                                </a><br />
-                                <a href="#" onClick={() => { setShowMultiplayer(true); setShowMainMenu(false) }}>
-                                    Play online
-                                </a><br />
-                                <a href="#" onClick={() => { setMyTeam(2); setAIgame(true); setShowRestart(!showRestart); setShowMainMenu(false) }}>
-                                    Play against (a stupid) AI as red
-                                </a><br />
-                                <a href="#" onClick={() => { setMyTeam(1); setAIgame(true); setShowRestart(!showRestart); setShowMainMenu(false) }}>
-                                    Play against (a stupid) AI as green
-                                </a><br />
-                                <a href="#" onClick={() => { setShowSaveGameInput(true); setShowMainMenu(false) }}>
-                                    Save Game
-                                </a><br />
-                                <a href="#" onClick={() => { setShowLoadGame(true); setShowMainMenu(false) }}>
-                                    Load Game
-                                </a><br />
-                                <a href="#" onClick={() => props.setShowMenu(false)}>
-                                    Close Menu
+                            {/* Load games */}
+                            <div className={showLoadGame ? '' : 'hidden'}>
+                                <MenuSection title="Choose a game to load:">
+                                    <ul>
+                                        {allSavedGames === null ? <li key="nogames"><i>No games saved.</i></li> :
+                                            allSavedGames.map((g, i) =>
+                                                i <= 9 ?
+                                                    <li key={g}>
+                                                        <i>
+                                                            {i + 1}.&nbsp;
+                                                            <a href="#" onClick={() => {
+                                                                setShowLoadGame(false);
+                                                                setShowMainMenu(true);
+                                                                props.loadGame(g)
+                                                            }}
+                                                            >
+                                                                {g}
+                                                            </a>
+                                                        </i>
+                                                        <br />
+                                                    </li>
+                                                    : ''
+                                            )
+                                        }
+                                    </ul>
+                                </MenuSection>
+                                <br />
+                                <a href="#" onClick={() => { setShowLoadGame(false); setShowMainMenu(true); }}>
+                                    Back...
                                 </a>
+                            </div>
+
+                            {/* Restart game  */}
+                            <div className={showRestart ? '' : 'hidden'}>
+                                <MenuSection title="Choose a game type">
+                                    {stonesByName.map(s =>
+                                        <a key={s.name} href="#" onClick={() => newGame(s.stones)}>
+                                            - {s.formalName}<br />
+                                        </a>
+                                    )}
+                                </MenuSection>
+                                <br />
+                                <a href="#" onClick={() => { setShowRestart(false); setShowMainMenu(true); }}>
+                                    Back...
+                                </a>
+                            </div>
+
+                            {/* Multiplayer menu */}
+                            <div className={showMultiplayer ? '' : 'hidden'}>
+                                <MultiplayerMenu closeMenu={() => {setShowMultiplayer(false); setShowMainMenu(true);}} startOnlineGame={startOnlineGame} />
+                            </div>
+
+                            {/* Main menu */}
+                            <div className={showMainMenu ? '' : 'hidden'}>
+                                <MenuSection title="Start a new game">
+                                    <a href="#" onClick={() => { setAIgame(false); setShowRestart(!showRestart); setShowMainMenu(false) }}>
+                                        Play both teams locally
+                                    </a><br />
+                                    <a href="#" onClick={() => { setShowMultiplayer(true); setShowMainMenu(false) }}>
+                                        Play online
+                                    </a><br />
+                                    <div className="">
+                                        Play against a (stupid) AI
+                                    </div>
+                                    <a href="#" onClick={() => { setMyTeam(2); setAIgame(true); setShowRestart(!showRestart); setShowMainMenu(false) }}>
+                                        ...as red
+                                    </a><br />
+                                    <a href="#" onClick={() => { setMyTeam(1); setAIgame(true); setShowRestart(!showRestart); setShowMainMenu(false) }}>
+                                        ...as green
+                                    </a>
+                                </MenuSection>
+                                <MenuSection title="Load/save games">
+                                    <a href="#" onClick={() => { setShowSaveGameInput(true); setShowMainMenu(false) }}>
+                                        Save Game
+                                    </a><br />
+                                    <a href="#" onClick={() => { setShowLoadGame(true); setShowMainMenu(false) }}>
+                                        Load Game
+                                    </a>
+                                </MenuSection>
+
+                                <div className="font-bold mt-4">
+                                    <a href="#" onClick={() => props.setShowMenu(false)}>
+                                        Close Menu
+                                    </a>
+                                </div>
                             </div>
                         </div>
 

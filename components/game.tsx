@@ -8,16 +8,15 @@ import { getStonesAfterMovement } from '../lib/path'
 import { checkBeating, isKingInCorner } from '../lib/beating'
 import { saveGameToLocalStroage, loadGameFromLocalStroage, savedGame } from '../lib/savegame'
 import { AIGetNextMove } from '../lib/ai/move'
-import { useMultiplayerListener } from '../hooks/useMultiplayerListener'
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import { BSON } from 'realm-web'
 import MultiplayerListener from './MultiplayerListener'
 import { sendMoveToServer } from '../lib/multiplayer'
 
 export default function Game(props: {
-    setBgColor: Function
+    setBgColor: Function,
+    setTitleAppendix: Function
 }) {
     const isDev = process.env.NODE_ENV === 'development'
     const [selectedStone, setSelectedStone] = useState<Stone | null>(null)
@@ -120,6 +119,11 @@ export default function Game(props: {
         if (!isValidMove(actualStones, fromStone, toStone)) return
         console.log('I received a valid move from the opponent and am moving the stone.')
         moveStone(actualStones, fromStone, toStone)
+
+        // notify user
+        props.setTitleAppendix("// you're up!")
+        var snd = new  Audio("/msg.wav");  
+        snd.play();
     }
 
     const handleOpponent = (opponent: string) => {
@@ -170,6 +174,7 @@ export default function Game(props: {
 
         if (onlineGameId && (whichTeamIsOn == myteam[0])) {
             console.log('Sending my move to the server...')
+            props.setTitleAppendix("")
             sendMoveToServer(onlineGameId, myteam, from, to)
             setShowThinkingIndicator(true)
         }
@@ -308,7 +313,7 @@ export default function Game(props: {
                     hnefatafl
                 </a>
                 {opponentName !== null ?
-                    <div className="mt-4 text-base" style={{ fontFamily: 'Roboto Mono' }}>
+                    <div className="mt-4 text-base" style={{ fontFamily: 'Raleway' }}>
                         {opponentName.length == 0 ? 'Warte auf Gegner...' :
                             <>
                                 Online-Spiel gegen {opponentName}

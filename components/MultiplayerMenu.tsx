@@ -1,9 +1,11 @@
 import { useState } from "react"
 import MultiplayerOpenGames from "./MultiplayerOpenGames"
 import { stonesByName } from '../lib/initialSetup'
+import MenuSection from "./MenuSection"
 
 export default function MultiplayerMenu(props: {
-    startOnlineGame: Function
+    startOnlineGame: Function,
+    closeMenu: Function
 }) {
     const [hostName, setHostName] = useState('')
     const [showMainMenu, setShowMainMenu] = useState(true)
@@ -25,9 +27,9 @@ export default function MultiplayerMenu(props: {
             })
         })
 
-        if(!ret) return 
+        if (!ret) return
         const retJSON = await ret.json()
-        if(!retJSON.id) return 
+        if (!retJSON.id) return
 
         setShowMainMenu(false)
         setShowNewOrJoin(true)
@@ -50,46 +52,50 @@ export default function MultiplayerMenu(props: {
 
     return (
         <div>
-            {/* Entry point */}
+            {/* Name selection */}
             <div className={showMainMenu ? '' : 'hidden'}>
-                <div>
-                    Select a name...
-                </div>
-                <div>
-                    <input className={"input "} value={hostName} onChange={(e) => setHostName(e.target.value)} />
-                </div>
-                <div>
-                    <a href="#" className={hostName.length > 0 ? '' : 'hidden'} onClick={() => step2()}>OK</a><br /><br />
-                </div>
+                <MenuSection title="Select a name">
+                    <div>
+                        <input className={"input "} value={hostName} onChange={(e) => setHostName(e.target.value)} />
+                    </div>
+                    <div>
+                        <a href="#" className={hostName.length > 0 ? '' : 'hidden'} onClick={() => step2()}>OK</a><br /><br />
+                    </div>
+                </MenuSection>
+                <a href="#" onClick={() => { props.closeMenu() }}>
+                    Back to main menu
+                </a>
             </div>
+
+            {/* Create or join game */}
             <div className={showNewOrJoin ? '' : 'hidden'}>
-                <div>
-                    <a key="createred" href="#" onClick={() => step3(2)}>Create a new game as red</a><br />
-                    <a key="creategreen" href="#" onClick={() => step3(1)}>Create a new game as green</a>
-                </div>
-                <div className="my-4">
-                    Open games:
+                <MenuSection title="Create a new game">
+                    <a key="createred" href="#" onClick={() => step3(2)}>...as red</a><br />
+                    <a key="creategreen" href="#" onClick={() => step3(1)}>...as green</a>
+                </MenuSection>
+                <MenuSection title="Join an open game">
                     <MultiplayerOpenGames myName={hostName} startOnlineGame={props.startOnlineGame} />
-                </div>
+                </MenuSection>
                 <div>
-                    <a href="#" onClick={() => { setShowNewOrJoin(false); setShowMainMenu(true) }}>Back to name selection</a>
+                    <br />
+                    <a href="#" onClick={() => { setShowNewOrJoin(false); setShowMainMenu(true) }}>Change your name</a>
                 </div>
+                <a href="#" onClick={() => { props.closeMenu() }}>
+                    Back to main menu
+                </a>
             </div>
             <div className={showGameSelector ? '' : 'hidden'}>
-                <div>
-                    Choose a game type:
-                </div>
-                <div>
-                    {stonesByName.map(s => 
+                <MenuSection title="Choose a game type">
+                    {stonesByName.map(s =>
                         <a key={s.name} href="#" onClick={() => createOnlineGame(s)}>
                             - {s.formalName}
                             <br />
                         </a>
                     )}
-                    <br />
-                </div>
+                </MenuSection>
+                <br />
                 <div>
-                    <a href="#" onClick={() => { setShowNewOrJoin(true); setShowGameSelector(false) }}>Back to join/create</a>
+                    <a href="#" onClick={() => { setShowNewOrJoin(true); setShowGameSelector(false) }}>Back...</a>
                 </div>
             </div>
 

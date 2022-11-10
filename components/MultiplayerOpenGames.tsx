@@ -43,7 +43,7 @@ export default function MultiplayerOpenGames(props: {
 
     return (
         <div>
-            {data.length == 0 ? <>No open games.</> : ''}
+            {data.length == 0 ? <>No open games found.</> : ''}
             <ul>
                 {data.map((g: any) =>
                     <li key={g._id}>
