@@ -4,4 +4,7 @@ This is a modern implementation of the ancient game of hnefatafl. You can see it
 
 It includes a rudimentary AI as well as a multiplayer mode using MongoDB.
 
-If you'd like to contribute, feel free to reach out.
+If you'd like to contribute, feel free to reach out. Current open points include:
+ - Validation of ther ruleset with someone more involved with the game itself 
+ - Building a better AI - currently, it's severly limited by the lookahead as it does a simple search. I'd love to train an agent-based model, or at least improve upon the current search-based algorithm.
+ - A tutorial for beginners.
