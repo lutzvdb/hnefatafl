@@ -12,7 +12,7 @@ export default function Board(props: {
 
     const getProperStyle = (item: number, row: number, col: number) => {
         // basic styling
-        var styles = `shadow-md duration-75 ease-in
+        var styles = `shadow-md duration-100 ease-in
             rounded-md md:rounded-xl lg:rounded-xl xl:rounded-xl 2xl:rounded-xl
             `
 

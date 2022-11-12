@@ -2,7 +2,7 @@ import Board from '../components/board'
 import Menu from '../components/menu'
 import { useEffect, useState } from 'react'
 import { isValidMove } from '../lib/moveValidity'
-import { defaultStones } from '../lib/initialSetup'
+import { brandubh, defaultStones } from '../lib/initialSetup'
 import { Stone } from '../lib/stone'
 import { getStonesAfterMovement } from '../lib/path'
 import { checkBeating, isKingInCorner } from '../lib/beating'
@@ -13,12 +13,14 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import MultiplayerListener from './MultiplayerListener'
 import { sendMoveToServer } from '../lib/multiplayer'
+import { Tutorial } from './tutorial'
 
 export default function Game(props: {
     setBgColor: Function,
     setTitleAppendix: Function
 }) {
     const isDev = process.env.NODE_ENV === 'development'
+    const [showTutorial, setShowTutorial] = useState(false)
     const [selectedStone, setSelectedStone] = useState<Stone | null>(null)
     const [visibleStones, setVisibleStones] = useState(defaultStones)
     const [actualStones, setActualStones] = useState(defaultStones)
@@ -101,7 +103,7 @@ export default function Game(props: {
             setShowThinkingIndicator(true)
         }
 
-        if(gameId === null) setOpponentName(null)
+        if (gameId === null) setOpponentName(null)
         setOnlineGameId(gameId)
     }
 
@@ -122,7 +124,7 @@ export default function Game(props: {
 
         // notify user
         props.setTitleAppendix("// you're up!")
-        var snd = new  Audio("/msg.wav");  
+        var snd = new Audio("/msg.wav");
         snd.play();
     }
 
@@ -132,15 +134,15 @@ export default function Game(props: {
             // yeah, someone joined!
             console.log('Opponent joined')
             showSnackbar(opponent + ' joined the game!')
-            if(myteam[0] === 2) setShowThinkingIndicator(false)
+            if (myteam[0] === 2) setShowThinkingIndicator(false)
             setWhichTeamIsOn(2) // red begins
             setOpponentName(opponent)
         }
-    } 
+    }
 
     // hook to handle updates from DB that were streamed
     useEffect(() => {
-        if(!latestMultiplayerUpdate || !onlineGameId) return 
+        if (!latestMultiplayerUpdate || !onlineGameId) return
 
         // all good!
         if (latestMultiplayerUpdate.moves) handleMultiplayerMove(latestMultiplayerUpdate.moves)
@@ -286,6 +288,17 @@ export default function Game(props: {
         }
     }, [whichTeamIsOn])
 
+    const startTutorial = () => {
+        setShowTutorial(true)
+        setMyTeam([-1])
+    }
+
+    const finishTutorial = () => {
+        setShowTutorial(false)
+        // start a basic game after tutorial
+        restartGame(brandubh, false, 2, false, null)
+    }
+
     return (
         <>
             <MultiplayerListener onlineGameId={onlineGameId} handleUpdate={setLatestMultiplayerUpdate} />
@@ -299,15 +312,19 @@ export default function Game(props: {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+            <div className={showTutorial ? '' : 'hidden'}>
+                <Tutorial setStones={setVisibleStones} finishTutorial={finishTutorial} />
+            </div>
             <Menu
                 showMenu={showMenu}
                 setShowMenu={setShowMenu}
                 restartGame={restartGame}
                 saveGame={(gameName: string) => saveGame(gameName)}
                 loadGame={(gameName: string) => loadGame(gameName)}
+                startTutorial={startTutorial}
                 setOpponentName={setOpponentName}
             />
-            <div className={`text-6xl lg:text-8xl xl:text-8xl 2xl:text-8xl text-center p-5
+            <div className={`text-6xl lg:text-8xl text-center p-5
                             bg-gradient-to-b from-white ` + (whichTeamIsOn == 1 ? 'bg-emerald-50' : 'bg-rose-50')} >
                 <a href="#" onClick={() => setShowMenu(true)}>
                     hnefatafl
@@ -321,10 +338,12 @@ export default function Game(props: {
                     </div>
                     : ''}
             </div>
-            <div className={"grid place-content-center mt-5 duration-200 " + (showThinkingIndicator ? ' opacity-50' : '')}>
+            <div className={"grid place-content-center mt-5 duration-500 " +
+                (showThinkingIndicator ? ' opacity-50' : '') + 
+                (showTutorial ? 'mt-32 lg:mt-24' : '')}>
                 <div className="aspect-square p-3" style={{
                     width: '100vh',
-                    maxWidth: 'min(100vw, 650px)'
+                    maxWidth: 'min(100vw, 600px)'
                 }}>
                     <Board
                         stones={visibleStones}

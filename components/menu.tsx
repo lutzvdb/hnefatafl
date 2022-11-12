@@ -15,7 +15,8 @@ export default function Menu(props: {
     setShowMenu: Function,
     saveGame: Function,
     loadGame: Function
-    setOpponentName: Function
+    setOpponentName: Function,
+    startTutorial: Function
 }) {
     const [showSaveGameInput, setShowSaveGameInput] = useState(false)
     const [showLoadGame, setShowLoadGame] = useState(false)
@@ -176,6 +177,11 @@ export default function Menu(props: {
                                     </a><br />
                                     <a href="#" onClick={() => { setShowLoadGame(true); setShowMainMenu(false) }}>
                                         Load Game
+                                    </a>
+                                </MenuSection>
+                                <MenuSection title="Tutorial">
+                                    <a href="#" onClick={() => { props.setShowMenu(false); props.startTutorial(); }}>
+                                        Start beginners tutorial
                                     </a>
                                 </MenuSection>
 

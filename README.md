@@ -7,4 +7,4 @@ It includes a rudimentary AI as well as a multiplayer mode using MongoDB.
 If you'd like to contribute, feel free to reach out. Current open points include:
  - Validation of ther ruleset with someone more involved with the game itself 
  - Building a better AI - currently, it's severly limited by the lookahead as it does a simple search. I'd love to train an agent-based model, or at least improve upon the current search-based algorithm.
- - A tutorial for beginners.
+ - A recoded game core that more efficiently can determine legality of moves and beating to improve AI speed
