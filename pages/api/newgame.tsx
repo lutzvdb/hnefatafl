@@ -35,7 +35,7 @@ const checkInput = (body: any) => {
     // legit host name?
     if (typeof body.host !== "string") return (false)
     if (body.host.length == 0) return (false)
-    if (body.host.length > 10) return (false)
+    if (body.host.length >= 10) return (false)
 
     // legit team choice?
     if (typeof body.team !== "number") return (false)

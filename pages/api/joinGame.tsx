@@ -33,6 +33,7 @@ const checkInput = (body: any) => {
 
     if (typeof body.name !== "string") return (false)
     if (body.name.length == 0) return (false)
+    if (body.name.length >= 10) return (false)
 
     return (true)
 }

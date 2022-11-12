@@ -188,7 +188,7 @@ export default function Menu(props: {
                         </div>
 
                         <div className="border-t border-gray-300 w-full my-5" ></div>
-                        <div className="text-sm" style={{ fontFamily: 'Roboto Mono' }}>
+                        <div className="text-sm" style={{ fontFamily: 'Raleway' }}>
                             <a href="https://www.thisislutz.com">
                                 coded by lvdb
                             </a>

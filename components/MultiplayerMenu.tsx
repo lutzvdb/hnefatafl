@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import MultiplayerOpenGames from "./MultiplayerOpenGames"
 import { stonesByName } from '../lib/initialSetup'
 import MenuSection from "./MenuSection"
@@ -7,11 +7,22 @@ export default function MultiplayerMenu(props: {
     startOnlineGame: Function,
     closeMenu: Function
 }) {
+
     const [hostName, setHostName] = useState('')
     const [showMainMenu, setShowMainMenu] = useState(true)
     const [showNewOrJoin, setShowNewOrJoin] = useState(false)
     const [showGameSelector, setShowGameSelector] = useState(false)
     const [myTeam, setMyTeam] = useState(0)
+
+    useEffect(() => {
+        const storedName = localStorage.getItem('myName')
+        if (!storedName) return
+
+        // name already defined and saved, directly show option to join
+        if (hostName == '') setHostName(storedName)
+        setShowMainMenu(false)
+        setShowNewOrJoin(true)
+    }, [])
 
     const createOnlineGame = async (game: any) => {
         if (game.name.length == 0) return
@@ -50,16 +61,22 @@ export default function MultiplayerMenu(props: {
         setShowGameSelector(true)
     }
 
+    const changeHostName = (name: string) => {
+        setHostName(name);
+        localStorage.setItem('myName', name)
+    }
+
     return (
         <div>
             {/* Name selection */}
             <div className={showMainMenu ? '' : 'hidden'}>
                 <MenuSection title="Select a name">
                     <div>
-                        <input className={"input "} value={hostName} onChange={(e) => setHostName(e.target.value)} />
+                        <input className={"input "} value={hostName} onChange={(e) => changeHostName(e.target.value)} />
+                        <div className={hostName.length >= 10 ? 'text-red-700 font-bold' : 'hidden'}>Name ist zu lang!</div>
                     </div>
                     <div>
-                        <a href="#" className={hostName.length > 0 ? '' : 'hidden'} onClick={() => step2()}>OK</a><br /><br />
+                        <a href="#" className={(hostName.length > 0 && hostName.length < 10) ? '' : 'hidden'} onClick={() => step2()}>OK</a><br /><br />
                     </div>
                 </MenuSection>
                 <a href="#" onClick={() => { props.closeMenu() }}>
@@ -78,7 +95,7 @@ export default function MultiplayerMenu(props: {
                 </MenuSection>
                 <div>
                     <br />
-                    <a href="#" onClick={() => { setShowNewOrJoin(false); setShowMainMenu(true) }}>Change your name</a>
+                    <a href="#" onClick={() => { setShowNewOrJoin(false); setShowMainMenu(true) }}>Change your name ({hostName})</a>
                 </div>
                 <a href="#" onClick={() => { props.closeMenu() }}>
                     Back to main menu
