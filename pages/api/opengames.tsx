@@ -10,7 +10,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const dbResponse = await db
             .collection("game")
             .find({ 
-                latestActive: { $gte: addMinutes(new Date(), -30) }, 
+                latestActive: { $gte: addMinutes(new Date(), -3) }, 
                 opponent: { $exists: false }
             })
             .limit(10)

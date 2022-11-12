@@ -8,3 +8,4 @@ If you'd like to contribute, feel free to reach out. Current open points include
  - Validation of ther ruleset with someone more involved with the game itself 
  - Building a better AI - currently, it's severly limited by the lookahead as it does a simple search. I'd love to train an agent-based model, or at least improve upon the current search-based algorithm.
  - A recoded game core that more efficiently can determine legality of moves and beating to improve AI speed
+ - "I'm still here"-push to database to reaffirm that the host is still looking (update latestActive)
