@@ -157,27 +157,27 @@ function checkBeatingWithCorner(stones: number[][], whichTeamIsOn: number, newSt
     if (newStone.value === null) return (stones)
 
     const enemy = whichTeamIsOn == 1 ? 2 : 1
-
+    
     // up
-    if (newStone.row > 1) {
+    if (newStone.row == 2) {
         if (stones[newStone.row - 1][newStone.col] == enemy &&
             stones[newStone.row - 2][newStone.col] == 0 && 
-            newStone.row - 2 == 0 && (newStone.col == 0 || newStone.col == stones.length-1)) {
+            (newStone.col == 0 || newStone.col == stones.length-1)) {
 
             stones[newStone.row - 1][newStone.col] = 0
         }
     }
     // down
-    if (newStone.row < stones.length - 2) {
+    if (newStone.row == stones.length - 3) {
         if (stones[newStone.row + 1][newStone.col] == enemy &&
             stones[newStone.row + 2][newStone.col] == 0 && 
-            newStone.row + 2 == stones.length - 1 && (newStone.col == 0 || newStone.col == stones.length-1)) {
+            (newStone.col == 0 || newStone.col == stones.length-1)) {
 
             stones[newStone.row + 1][newStone.col] = 0
         }
     }
     // left
-    if (newStone.col > 1) {
+    if (newStone.col - 2 == 0) {
         if (stones[newStone.row][newStone.col - 1] == enemy &&
             stones[newStone.row][newStone.col - 2] == 0 && 
             newStone.col - 2 == 0 && (newStone.row == 0 || newStone.row == stones.length-1)) {
@@ -186,10 +186,10 @@ function checkBeatingWithCorner(stones: number[][], whichTeamIsOn: number, newSt
         }
     }
     // right
-    if (newStone.col < stones.length - 2) {
+    if (newStone.col == stones.length - 3) {
         if (stones[newStone.row][newStone.col + 1] == enemy &&
             stones[newStone.row][newStone.col + 2] == 0 && 
-            newStone.col + 2 == 0 && (newStone.row == 0 || newStone.row == stones.length-1)) {
+            (newStone.row == 0 || newStone.row == stones.length-1)) {
 
             stones[newStone.row][newStone.col + 1] = 0
         }
