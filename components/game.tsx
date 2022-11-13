@@ -20,8 +20,10 @@ export default function Game(props: {
     setTitleAppendix: Function
 }) {
     const isDev = process.env.NODE_ENV === 'development'
+    const [takenPiecesRed, setTakenPiecesRed] = useState(0)
+    const [takenPiecesGreen, setTakenPiecesGreen] = useState(0)
     const [showTutorial, setShowTutorial] = useState(false)
-    const [updateLatestActiveTimer, setUpdateLatestActiveTimer] = useState<any|null>(null)
+    const [updateLatestActiveTimer, setUpdateLatestActiveTimer] = useState<any | null>(null)
     const [selectedStone, setSelectedStone] = useState<Stone | null>(null)
     const [visibleStones, setVisibleStones] = useState(defaultStones)
     const [actualStones, setActualStones] = useState(defaultStones)
@@ -87,12 +89,14 @@ export default function Game(props: {
         setSelectedStone(null)
         setActualStones(stones)
         setVisibleStones(stones)
-        if (!isRestart) setInitialStones(stones)
+        setInitialStones(stones)
         setValidPathInSelection(false)
         setWinnerTeam(null)
         setShowThinkingIndicator(false)
         props.setBgColor(" bg-rose-50")
         setWhichTeamIsOn(2)
+        setTakenPiecesGreen(0)
+        setTakenPiecesRed(0)
 
         if (isAIgame && myTeam == 1) {
             // AI starts!
@@ -161,7 +165,7 @@ export default function Game(props: {
             const i = setInterval(() => {
                 // let the outside know we're still here every 30sec
                 updateLatestActive(onlineGameId)
-            }, 30 * 1000)
+            }, 1 * 1000)
             setUpdateLatestActiveTimer(i)
         } else {
             // someone has joined
@@ -200,6 +204,13 @@ export default function Game(props: {
         setVisibleStones(newStones)
         setValidPathInSelection(false)
         setSelectedStone(null)
+
+        const originalRedPieces = initialStones.map(r => r.filter(i => i == 2).length).reduce((a,b) => a+b)
+        const redPiecesInGame = newStones.map(r => r.filter(i => i == 2).length).reduce((a,b) => a+b)
+        setTakenPiecesRed(originalRedPieces - redPiecesInGame)
+        const originalGreenPieces = initialStones.map(r => r.filter(i => i == 1).length).reduce((a,b) => a+b)
+        const greenPiecesInGame = newStones.map(r => r.filter(i => i == 1).length).reduce((a,b) => a+b)
+        setTakenPiecesGreen(originalGreenPieces - greenPiecesInGame)
 
         if (isKingInCorner(newStones)) {
             handleWin(1)
@@ -339,17 +350,21 @@ export default function Game(props: {
                 <a href="#" onClick={() => setShowMenu(true)}>
                     hnefatafl
                 </a>
-                {opponentName !== null ?
-                    <div className="mt-4 text-base" style={{ fontFamily: 'Raleway' }}>
-                        {opponentName.length == 0 ? 'Warte auf Gegner...' :
-                            <>
-                                Online-Spiel gegen {opponentName}
-                            </>}
-                    </div>
-                    : ''}
+
+                <div className="mt-4 text-base" style={{ fontFamily: 'Raleway' }}>
+                    Taken pieces: Red {takenPiecesRed}, Green {takenPiecesGreen}
+                    {opponentName !== null ?
+                        (
+                            opponentName.length == 0 ? ' // Waiting for opponent...' :
+                                <>
+                                    &nbsp;// Online game against {opponentName}
+                                </>
+                        )
+                        : ''}
+                </div>
             </div>
             <div className={"grid place-content-center mt-5 duration-500 " +
-                (showThinkingIndicator ? ' opacity-50' : '') + 
+                (showThinkingIndicator ? ' opacity-50' : '') +
                 (showTutorial ? 'mt-32 lg:mt-24' : '')}>
                 <div className="aspect-square p-3" style={{
                     width: '100vh',
