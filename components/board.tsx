@@ -84,6 +84,7 @@ export default function Board(props: {
     if (props.stones.length == 11) gridClasses += ' grid-cols-11'
     if (props.stones.length == 9) gridClasses += ' grid-cols-9'
     if (props.stones.length == 7) gridClasses += ' grid-cols-7'
+    if (props.stones.length == 5) gridClasses += ' grid-cols-5'
     if (props.stones.length == 19) {
         var gridClasses = `grid 
         gap-1 md:gap-2 lg:gap-2 xl:gap-3 2xl:gap-3

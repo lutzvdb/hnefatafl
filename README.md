@@ -9,7 +9,7 @@ If you'd like to contribute, feel free to reach out. Current open points include
 ## Larger work items
  - Validation of ther ruleset with someone more involved with the game itself 
  - Building a better AI - currently, it's severly limited by the lookahead as it does a simple search. I'd love to train an agent-based model, or at least improve upon the current search-based algorithm.
- - A recoded game core that more efficiently can determine legality of moves and beating to improve AI speed
+ - A further optimized game core that more efficiently can determine legality of moves and beating to improve AI speed
  - Determine when a now moves are left for a player and declare the other player the winner
  - Replay
  - Testing, especially for beating rules and movement rules
