@@ -17,3 +17,16 @@ export const sendMoveToServer = (onlineGameId: string, myteam: number[], from: S
         })
     })
 }
+
+export const updateLatestActive = (onlineGameId: string) => {
+    // let the database know we're still looking
+    if (!onlineGameId) return
+
+    fetch('/api/updateLatestActive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            gameId: onlineGameId
+        })
+    })
+}

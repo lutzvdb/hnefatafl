@@ -5,7 +5,13 @@ This is a modern implementation of the ancient game of hnefatafl. You can see it
 It includes a rudimentary AI as well as a multiplayer mode using MongoDB.
 
 If you'd like to contribute, feel free to reach out. Current open points include:
+
+# Larger work items
  - Validation of ther ruleset with someone more involved with the game itself 
  - Building a better AI - currently, it's severly limited by the lookahead as it does a simple search. I'd love to train an agent-based model, or at least improve upon the current search-based algorithm.
  - A recoded game core that more efficiently can determine legality of moves and beating to improve AI speed
- - "I'm still here"-push to database to reaffirm that the host is still looking (update latestActive)
+ - Determine when a now moves are left for a player and declare the other player the winner
+ - Settings page, including: Disable sound, AI difficulty
+ - Count of taken pieces
+ - Replay
+ - Link preventDefault to avoid "#" at end of URL

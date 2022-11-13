@@ -12,7 +12,7 @@ import { AIGetNextMove } from '../lib/ai/move'
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import MultiplayerListener from './MultiplayerListener'
-import { sendMoveToServer } from '../lib/multiplayer'
+import { sendMoveToServer, updateLatestActive } from '../lib/multiplayer'
 import { Tutorial } from './tutorial'
 
 export default function Game(props: {
@@ -21,6 +21,7 @@ export default function Game(props: {
 }) {
     const isDev = process.env.NODE_ENV === 'development'
     const [showTutorial, setShowTutorial] = useState(false)
+    const [updateLatestActiveTimer, setUpdateLatestActiveTimer] = useState<any|null>(null)
     const [selectedStone, setSelectedStone] = useState<Stone | null>(null)
     const [visibleStones, setVisibleStones] = useState(defaultStones)
     const [actualStones, setActualStones] = useState(defaultStones)
@@ -156,6 +157,15 @@ export default function Game(props: {
             console.log('Waiting for opponent...')
             setShowThinkingIndicator(true)
             setWhichTeamIsOn(-1)
+
+            const i = setInterval(() => {
+                // let the outside know we're still here every 30sec
+                updateLatestActive(onlineGameId)
+            }, 30 * 1000)
+            setUpdateLatestActiveTimer(i)
+        } else {
+            // someone has joined
+            clearInterval(updateLatestActiveTimer)
         }
     }, [opponentName])
 

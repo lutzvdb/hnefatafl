@@ -149,7 +149,7 @@ export default function Menu(props: {
 
                             {/* Multiplayer menu */}
                             <div className={showMultiplayer ? '' : 'hidden'}>
-                                <MultiplayerMenu closeMenu={() => {setShowMultiplayer(false); setShowMainMenu(true);}} startOnlineGame={startOnlineGame} />
+                                <MultiplayerMenu isVisible={showMultiplayer} closeMenu={() => {setShowMultiplayer(false); setShowMainMenu(true);}} startOnlineGame={startOnlineGame} />
                             </div>
 
                             {/* Main menu */}

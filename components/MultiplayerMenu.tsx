@@ -5,7 +5,8 @@ import MenuSection from "./MenuSection"
 
 export default function MultiplayerMenu(props: {
     startOnlineGame: Function,
-    closeMenu: Function
+    closeMenu: Function,
+    isVisible: boolean
 }) {
 
     const [hostName, setHostName] = useState('')
@@ -91,7 +92,7 @@ export default function MultiplayerMenu(props: {
                     <a key="creategreen" href="#" onClick={() => step3(1)}>...as green</a>
                 </MenuSection>
                 <MenuSection title="Join an open game">
-                    <MultiplayerOpenGames myName={hostName} startOnlineGame={props.startOnlineGame} />
+                    <MultiplayerOpenGames isVisible={props.isVisible} myName={hostName} startOnlineGame={props.startOnlineGame} />
                 </MenuSection>
                 <div>
                     <br />

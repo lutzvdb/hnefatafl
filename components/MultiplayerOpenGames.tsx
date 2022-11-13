@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { stonesByName } from '../lib/initialSetup'
 
@@ -11,13 +12,29 @@ async function fetcher<JSON = any>(
 
 export default function MultiplayerOpenGames(props: {
     startOnlineGame: Function,
-    myName: string
+    myName: string,
+    isVisible: boolean
 }) {
-    const { data, error } = useSWR('/api/opengames', fetcher)
+    const [myInt, setMyInterval] = useState<any|null>(null)
+    const OG = useSWR('/api/opengames', fetcher)
+
+    useEffect(() => {
+        if(props.isVisible) {
+            OG.mutate() // initial refresh on open
+
+            // continually refresh
+            const i = setInterval(() => {
+                OG.mutate()
+            }, 5000)
+            setMyInterval(i)
+        } else {
+            clearInterval(myInt)
+        }
+    }, [props.isVisible])
     
-    if (error) return <div>Error loading multiplayer games.</div>
-    if (!data) return <div>Loading...</div>
-    if (!Array.isArray(data)) return <div>Error loading multiplayer games.</div>
+    if (OG.error) return <div>Error loading multiplayer games.</div>
+    if (!OG.data) return <div>Loading...</div>
+    if (!Array.isArray(OG.data)) return <div>Error loading multiplayer games.</div>
 
     const joinGame = async (game: any) => {
         // get correct stones for desired game type
@@ -43,9 +60,9 @@ export default function MultiplayerOpenGames(props: {
 
     return (
         <div>
-            {data.length == 0 ? <>No open games found.</> : ''}
+            {OG.data.length == 0 ? <>No open games found.</> : ''}
             <ul>
-                {data.map((g: any) =>
+                {OG.data.map((g: any) =>
                     <li key={g._id}>
                          - <a href="#" onClick={() => joinGame(g)}>{g.host} </a>
                         <span className="text-xs">{g.game}, host plays {g.hostTeam == 1 ? 'green' : 'red'}</span>
