@@ -24,7 +24,7 @@ export function checkBeating(stones: number[][], whichTeamIsOn: number, newStone
     afterBeating = checkSimpleBeating(stones, whichTeamIsOn, newStone)
     afterBeating = checkBeatingWithCorner(stones, whichTeamIsOn, newStone)
     afterBeating = checkBeatingWithEmptyThrone(stones, whichTeamIsOn, newStone)
-    if (whichTeamIsOn == 2) afterBeating = checkKingNew(afterBeating, kingPos)
+    if (whichTeamIsOn == 2) afterBeating = checkKingBeating(afterBeating, kingPos)
 
     return (afterBeating)
 }
@@ -39,69 +39,8 @@ export function getKingPos(stones: number[][]) {
     return (kingPos)
 }
 
-// if the king is surrounded by 3 sides and the throne, he's done
-function checkKingThreeSidesAndThrone(stones: number[][] | number, kingPos: Stone) {
-    if (!Array.isArray(stones)) return (stones) // already beaten
-    
-    // above throne
-    if (kingPos.row == (stones.length - 1) / 2 - 1 &&
-        kingPos.col == (stones.length - 1) / 2 &&
-        stones[kingPos.row - 1][kingPos.col] == 2 &&
-        stones[kingPos.row][kingPos.col - 1] == 2 &&
-        stones[kingPos.row][kingPos.col + 1] == 2) {
-        return (2) // team 2 has won!
-    }
-
-    // below throne
-    if (kingPos.row == (stones.length - 1) / 2 + 1 &&
-        kingPos.col == (stones.length - 1) / 2 &&
-        stones[kingPos.row + 1][kingPos.col] == 2 &&
-        stones[kingPos.row][kingPos.col - 1] == 2 &&
-        stones[kingPos.row][kingPos.col + 1] == 2) {
-        return (2) // team 2 has won!
-    }
-
-    // left of throne
-    if (kingPos.col == (stones.length - 1) / 2 - 1 &&
-        kingPos.row == (stones.length - 1) / 2 &&
-        stones[kingPos.row - 1][kingPos.col] == 2 &&
-        stones[kingPos.row + 1][kingPos.col] == 2 &&
-        stones[kingPos.row][kingPos.col - 1] == 2) {
-        return (2) // team 2 has won!
-    }
-
-    // right of throne
-    if (kingPos.col == (stones.length - 1) / 2 + 1 &&
-        kingPos.row == (stones.length - 1) / 2 &&
-        stones[kingPos.row - 1][kingPos.col] == 2 &&
-        stones[kingPos.row + 1][kingPos.col] == 2 &&
-        stones[kingPos.row][kingPos.col + 1] == 2) {
-        return (2) // team 2 has won!
-    }
-
-    return (stones)
-}
-
 // if the king is surrounded by 4 sides, he's done
-function checkKingFourSides(stones: number[][], kingPos: Stone) {
-
-    // if on the edge, king is not touched by 4-side-rule
-    if (kingPos.row == 0 || kingPos.row == stones.length - 1 ||
-        kingPos.col == 0 || kingPos.col == stones.length - 1) return (stones)
-
-    // check if surrounded on all sides
-    if (stones[kingPos.row - 1][kingPos.col] == 2 &&
-        stones[kingPos.row + 1][kingPos.col] == 2 &&
-        stones[kingPos.row][kingPos.col - 1] == 2 &&
-        stones[kingPos.row][kingPos.col + 1] == 2) {
-        return (2) // team 2 has won!
-    }
-
-    return (stones)
-}
-
-// if the king is surrounded by 4 sides, he's done
-function checkKingNew(stones: number[][], kingPos: Stone) {
+function checkKingBeating(stones: number[][], kingPos: Stone) {
     var thronePos: Stone = {
         row: (stones.length - 1) / 2,
         col: (stones.length - 1) / 2
@@ -111,25 +50,21 @@ function checkKingNew(stones: number[][], kingPos: Stone) {
     if (kingPos.row == 0 || kingPos.row == stones.length - 1 ||
         kingPos.col == 0 || kingPos.col == stones.length - 1) return (stones)
 
-    
+    // Temporarily replace throne position with a red piece fur
+    // faster checking
     var tmpthronePosVal = stones[thronePos.row][thronePos.col]
     stones[thronePos.row][thronePos.col] = 2
-
-    /* DEPRACATED // check if surrounded on all sides
-    if ((stones[kingPos.row - 1][kingPos.col] == 2 || (kingPos.row - 1 == thronePos.row && kingPos.col == thronePos.col)) &&
-        (stones[kingPos.row + 1][kingPos.col] == 2 || (kingPos.row + 1 == thronePos.row && kingPos.col == thronePos.col)) &&
-        (stones[kingPos.row][kingPos.col - 1] == 2 || (kingPos.row == thronePos.row && kingPos.col - 1 == thronePos.col)) &&
-        (stones[kingPos.row][kingPos.col + 1] == 2 || (kingPos.row == thronePos.row && kingPos.col + 1 == thronePos.col))) {
-        return (2) // team 2 has won!
-    } */
 
     if (stones[kingPos.row - 1][kingPos.col] == 2 &&
         stones[kingPos.row + 1][kingPos.col] == 2 &&
         stones[kingPos.row][kingPos.col - 1] == 2 &&
         stones[kingPos.row][kingPos.col + 1] == 2) {
+            // King is surrounded on all sides... He has lost
+            // revert throne position and report back
             stones[thronePos.row][thronePos.col] = tmpthronePosVal
             return (2) // team 2 has won!
     }
+    // revert throne position
     stones[thronePos.row][thronePos.col] = tmpthronePosVal
     return (stones)
 }
