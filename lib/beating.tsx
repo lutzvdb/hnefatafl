@@ -24,11 +24,7 @@ export function checkBeating(stones: number[][], whichTeamIsOn: number, newStone
     afterBeating = checkSimpleBeating(stones, whichTeamIsOn, newStone)
     afterBeating = checkBeatingWithCorner(stones, whichTeamIsOn, newStone)
     afterBeating = checkBeatingWithEmptyThrone(stones, whichTeamIsOn, newStone)
-    if(stones[newStone.row][newStone.col] == 2) {
-        // a red stone was moved; check if red beat the king
-        afterBeating = checkKingFourSides(afterBeating, kingPos)
-        afterBeating = checkKingThreeSidesAndThrone(afterBeating, kingPos)   
-    }
+    if (whichTeamIsOn == 2) afterBeating = checkKingNew(afterBeating, kingPos)
 
     return (afterBeating)
 }
@@ -101,6 +97,40 @@ function checkKingFourSides(stones: number[][], kingPos: Stone) {
         return (2) // team 2 has won!
     }
 
+    return (stones)
+}
+
+// if the king is surrounded by 4 sides, he's done
+function checkKingNew(stones: number[][], kingPos: Stone) {
+    var thronePos: Stone = {
+        row: (stones.length - 1) / 2,
+        col: (stones.length - 1) / 2
+    }
+
+    // if on the edge, king is not touched by 4-side-rule
+    if (kingPos.row == 0 || kingPos.row == stones.length - 1 ||
+        kingPos.col == 0 || kingPos.col == stones.length - 1) return (stones)
+
+    
+    var tmpthronePosVal = stones[thronePos.row][thronePos.col]
+    stones[thronePos.row][thronePos.col] = 2
+
+    /* DEPRACATED // check if surrounded on all sides
+    if ((stones[kingPos.row - 1][kingPos.col] == 2 || (kingPos.row - 1 == thronePos.row && kingPos.col == thronePos.col)) &&
+        (stones[kingPos.row + 1][kingPos.col] == 2 || (kingPos.row + 1 == thronePos.row && kingPos.col == thronePos.col)) &&
+        (stones[kingPos.row][kingPos.col - 1] == 2 || (kingPos.row == thronePos.row && kingPos.col - 1 == thronePos.col)) &&
+        (stones[kingPos.row][kingPos.col + 1] == 2 || (kingPos.row == thronePos.row && kingPos.col + 1 == thronePos.col))) {
+        return (2) // team 2 has won!
+    } */
+
+    if (stones[kingPos.row - 1][kingPos.col] == 2 &&
+        stones[kingPos.row + 1][kingPos.col] == 2 &&
+        stones[kingPos.row][kingPos.col - 1] == 2 &&
+        stones[kingPos.row][kingPos.col + 1] == 2) {
+            stones[thronePos.row][thronePos.col] = tmpthronePosVal
+            return (2) // team 2 has won!
+    }
+    stones[thronePos.row][thronePos.col] = tmpthronePosVal
     return (stones)
 }
 
