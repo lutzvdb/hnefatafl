@@ -6,6 +6,7 @@ import { stonesByName } from '../lib/initialSetup'
 
 import TextField from '@mui/material/TextField';
 import MenuSection from './MenuSection';
+import { testAIspeed } from '../devhelper/AIspeed';
 
 const fontName = 'Raleway'
 
@@ -149,7 +150,7 @@ export default function Menu(props: {
 
                             {/* Multiplayer menu */}
                             <div className={showMultiplayer ? '' : 'hidden'}>
-                                <MultiplayerMenu isVisible={showMultiplayer} closeMenu={() => {setShowMultiplayer(false); setShowMainMenu(true);}} startOnlineGame={startOnlineGame} />
+                                <MultiplayerMenu isVisible={showMultiplayer} closeMenu={() => { setShowMultiplayer(false); setShowMainMenu(true); }} startOnlineGame={startOnlineGame} />
                             </div>
 
                             {/* Main menu */}
@@ -184,7 +185,16 @@ export default function Menu(props: {
                                         Start beginners tutorial
                                     </a>
                                 </MenuSection>
-
+                                {
+                                    process.env.NODE_ENV === 'development' ?
+                                        <MenuSection title="Developer stuff">
+                                            <a href="#" onClick={() => {
+                                                testAIspeed()
+                                            }}>Measure AI speed</a>
+                                        </MenuSection>
+                                        :
+                                        ''
+                                }
                                 <div className="font-bold mt-4">
                                     <a href="#" onClick={() => props.setShowMenu(false)}>
                                         Close Menu

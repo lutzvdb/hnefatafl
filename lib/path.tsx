@@ -31,17 +31,20 @@ export function getPath(from: Stone, to: Stone) {
     return intersectingCells;
 }
 
-export function getStonesAfterMovement(stones: number[][], from: Stone, to: Stone) {
-    const newStones = stones.map(
-        (row, rid) => row.map(
-            (col, cid) => {
-                if (!from.value) return (0) // just for type deduction
-                if (rid == from.row && cid == from.col) return (0)
-                if (rid == to.row && cid == to.col) return (from.value)
-                return (col)
-            }
-        )
-    )
+// creates a true deep copy for a 2D array
+function getTrueCopyFor2DArray(arr: any[]) {
+    var len = arr.length
+    var copy = new Array(len)
+    for (var i=0; i<len; ++i) copy[i] = arr[i].slice(0)
+    
+    return(copy)
+}
 
-    return (newStones)
+export function getStonesAfterMovement(stones: number[][], from: Stone, to: Stone) {
+    if (from.value === undefined) return (stones)
+    const stonesNew = getTrueCopyFor2DArray(stones)
+    stonesNew[from.row][from.col] = 0
+    stonesNew[to.row][to.col] = from.value
+
+    return (stonesNew)
 }

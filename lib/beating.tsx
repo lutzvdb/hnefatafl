@@ -24,8 +24,6 @@ export function checkBeating(stones: number[][], whichTeamIsOn: number, newStone
     afterBeating = checkSimpleBeating(stones, whichTeamIsOn, newStone)
     afterBeating = checkBeatingWithCorner(stones, whichTeamIsOn, newStone)
     afterBeating = checkBeatingWithEmptyThrone(stones, whichTeamIsOn, newStone)
-    //afterBeating = checkKingFourSides(afterBeating, kingPos)
-    //afterBeating = checkKingThreeSidesAndThrone(afterBeating, kingPos)
     if (whichTeamIsOn == 2) afterBeating = checkKingNew(afterBeating, kingPos)
 
     return (afterBeating)

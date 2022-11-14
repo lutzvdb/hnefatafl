@@ -85,6 +85,19 @@ export const defaultStones = brandubh
 
 
 export const stonesByName = [
+    /*
+    // just for testing purposes...
+    {
+        name: 'testmap',
+        stones: [
+            [0, 0, 2, 0, 0],
+            [0, 0, 2, 0, 0],
+            [0, 0, 3, 0, 0],
+            [0, 0, 2, 0, 0],
+            [0, 0, 2, 0, 0]
+        ],
+        formalName: 'Test map'
+    }, */
     {
         name: 'brandubh',
         stones: brandubh,

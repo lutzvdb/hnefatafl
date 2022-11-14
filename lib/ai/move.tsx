@@ -43,9 +43,17 @@ export function AIGetNextMove(stones: number[][], AIteam: number): stoneMoveWith
     }
     const scoreTemplateForOpponent: scoreTemplate = {
         uneventful: 0,
-        stoneBeaten: -100,
+        stoneBeaten: -200,
         gameWon: -10000,
         kingDistanceFromCenter: 0
+    }
+    // for performance reasons, scale down AI complexity with larger boards
+    // otherwise, calculations take too long
+    var recursionDepth = 3;
+    if(stones.length == 9) {
+        recursionDepth = 3
+    } else if(stones.length >= 11) {
+        recursionDepth = 2
     }
     const initialMoves = getAllMovesForSituation(stones, AIteam, scoreTemplateForAI, 1)
 
@@ -65,8 +73,9 @@ export function AIGetNextMove(stones: number[][], AIteam: number): stoneMoveWith
     var trajectories: hierarchicalTrajectory[] = initialMoves
         .map((i): hierarchicalTrajectory => ({ move: i, curDepth: 0, whichTeamIsOn: currentTeam == 1 ? 2 : 1 }))
 
-    trajectories = recursiveMoveTesting(trajectories, 1, 3,
-        AIteam, scoreTemplateForAI, scoreTemplateForOpponent)
+    const beginningOfRecursiveTesting = performance.now()
+    trajectories = recursiveMoveTesting(trajectories, 1, recursionDepth,
+        AIteam, scoreTemplateForAI, scoreTemplateForOpponent, beginningOfRecursiveTesting)
 
     const trajScores = trajectories.map(t => recursiveScoreSum(t))
     const bestScore = Math.max(...trajScores)
@@ -97,11 +106,15 @@ function recursiveMoveTesting
         maxDepth: number,
         AIteam: number,
         scoreTemplateForAI: scoreTemplate,
-        scoreTemplateForOpponent: scoreTemplate
+        scoreTemplateForOpponent: scoreTemplate,
+        beginningOfRecursiveTesting: number
     ): hierarchicalTrajectory[] {
 
     // if we have reached max depth, stop recursive iteration
     if (curDepth > maxDepth) return (trajectories)
+
+    // if calculation has already taken more than 5 seconds, just stop
+    if (performance.now() - beginningOfRecursiveTesting > 5000) return(trajectories)
 
     // go through all existing trajectories and calculate next steps
     for (var i = 0; i < trajectories.length; i++) {
@@ -111,7 +124,7 @@ function recursiveMoveTesting
             trajectories[i].move.stonesAfterMove,
             trajectories[i].whichTeamIsOn,
             trajectories[i].whichTeamIsOn == AIteam ? scoreTemplateForAI : scoreTemplateForOpponent,
-            1 / (curDepth + 2))
+            1 / (curDepth * 1.5 + 2))
 
         // add all resulting trajectories to list
         var followingTrajectories: hierarchicalTrajectory[] = nextSteps.map(singlestep => ({
@@ -125,7 +138,8 @@ function recursiveMoveTesting
             curDepth + 1,
             maxDepth,
             AIteam,
-            scoreTemplateForAI, scoreTemplateForOpponent
+            scoreTemplateForAI, scoreTemplateForOpponent,
+            beginningOfRecursiveTesting
         )
         trajectories[i].nextMoves = followingTrajectories
     }
@@ -150,16 +164,10 @@ function getAllMovesForSituation
 
 // pick drawingChance% of the moves
 function filterMoves(moves: Stone[], drawingChance: number) {
-    if(drawingChance == 1) return(moves)
+    if (drawingChance == 1) return (moves)
 
-    // always consider all moves for the king
-    const kingMoves = moves.filter(m => m.value == 3)
-    const peasantMoves = moves.filter(m => m.value != 3)
-    // pick drawingChance% of the peasant moves
-    peasantMoves.sort(() => 0.5 - Math.random());
-    let selected = peasantMoves.slice(0, Math.round(drawingChance * peasantMoves.length));
-    selected = selected.concat(kingMoves)
-    return (selected)
+    // return all possible moves for the king. For other players, have it depend on chance
+    return moves.filter(m => m.value == 3 || Math.random() < drawingChance)
 }
 
 function getMoveScore(stones: number[][], myteam: number, moves: stoneMove[], scoreTemplate: scoreTemplate): stoneMoveWithScore[] {
@@ -171,8 +179,8 @@ function getMoveScore(stones: number[][], myteam: number, moves: stoneMove[], sc
 
     const gameValueBeforeMove = getBoardValue(stones)
     for (var i = 0; i < moves.length; i++) {
-        var stonesAfterMove = getStonesAfterMovement(stones, moves[i].from, moves[i].to)
-        var afterBeating = checkBeating(stonesAfterMove, myteam, moves[i].to)
+        ret[i].stonesAfterMove = getStonesAfterMovement(stones, moves[i].from, moves[i].to)
+        var afterBeating = checkBeating(ret[i].stonesAfterMove, myteam, moves[i].to)
 
         // default value of move: 0
         if (!Array.isArray(afterBeating)) {
@@ -187,7 +195,7 @@ function getMoveScore(stones: number[][], myteam: number, moves: stoneMove[], sc
 
             // check for king position
             const kingPos: Stone = getKingPos(afterBeating)
-            if(kingPos.col != 3 || kingPos.row != 3) {
+            if (kingPos.col != 3 || kingPos.row != 3) {
                 const dist = (
                     // col
                     Math.abs(kingPos.col - (stones.length - 1) / 2)
@@ -221,6 +229,8 @@ function getAllPossibleMoves(stones: number[][], myStones: Stone[], drawingChanc
                 col: item.col,
                 value: stones[item.row][item.col]
             }))
+            .filter(i => i.value == 0) // only consider moves to empty fields..
+        
         possibleTargetStones = filterMoves(possibleTargetStones, drawingChance)
 
         var movesForThisStone: stoneMove[] = possibleTargetStones.map(
