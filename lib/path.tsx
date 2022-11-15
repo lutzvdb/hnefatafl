@@ -42,7 +42,7 @@ function getTrueCopyFor2DArray(arr: any[]) {
 
 export function getStonesAfterMovement(stones: number[][], from: Stone, to: Stone) {
     if (from.value === undefined) return (stones)
-    const stonesNew = getTrueCopyFor2DArray(stones)
+    const stonesNew: number[][] = getTrueCopyFor2DArray(stones)
     stonesNew[from.row][from.col] = 0
     stonesNew[to.row][to.col] = from.value
 
