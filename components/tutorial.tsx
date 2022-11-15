@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { brandubh, stonesByName } from '../lib/initialSetup'
+import CloseIcon from '@mui/icons-material/Close';
 
 export function Tutorial(
     props:
@@ -11,7 +12,7 @@ export function Tutorial(
 
     const [curStep, setCurStep] = useState(1)
     const [curMove, setCurMove] = useState(0)
-    const [curInterval, setCurInterval] = useState<any|null>(null)
+    const [curInterval, setCurInterval] = useState<any | null>(null)
 
     const steps = [
         {
@@ -364,7 +365,7 @@ export function Tutorial(
         setCurMove(0)
 
         // if we illustrated some moves before, let's clear out the old timer
-        if(curInterval !== null) { 
+        if (curInterval !== null) {
             clearInterval(curInterval)
             setCurInterval(null)
         }
@@ -392,12 +393,19 @@ export function Tutorial(
             <div className="w-full max-w-[600px] h-full bg-white bg-opacity-75 backdrop-blur-md rounded-xl" style={{ fontFamily: 'Raleway' }}>
                 <div className="flex flex-col h-full p-2">
                     {/* Tutorial text */}
-                    <div className="grow">
-                        <div className="font-bold pl-4 py-2">
-                            {steps[curStep - 1].headline}
+                    <div className="grow flex flex-row">
+                        <div className="grow">
+                            <div className="font-bold pl-4 py-2">
+                                {steps[curStep - 1].headline}
+                            </div>
+                            <div>
+                                {steps[curStep - 1].text}
+                            </div>
                         </div>
-                        <div>
-                            {steps[curStep - 1].text}
+                        <div className="py-2 pr-4">
+                            <a href="#" onClick={() => { setCurStep(1); props.finishTutorial(); }}>
+                                <CloseIcon />
+                            </a>
                         </div>
                     </div>
                     {/* Next / previous step selector */}

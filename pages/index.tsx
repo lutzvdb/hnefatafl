@@ -7,7 +7,6 @@ const Home: NextPage = () => {
     const [bgColor, setBgColor] = useState("bg-red-50")
     const [titleAppendix, setTitleAppendix] = useState('')
     const [fullTitle, setFullTitle] = useState('hnefatafl')
-    const classNames = "h-screen w-screen " + bgColor
 
     useEffect(() => {
         setFullTitle('hnefatafl' + titleAppendix)
@@ -18,7 +17,7 @@ const Home: NextPage = () => {
             <Head>
                 <title>{fullTitle}</title>
             </Head>
-            <div className={classNames}>
+            <div className={'h-screen w-screen duration-200 ' + bgColor}>
                 <Game setBgColor={setBgColor} setTitleAppendix={setTitleAppendix} />
             </div>
         </>

@@ -205,11 +205,11 @@ export default function Game(props: {
         setValidPathInSelection(false)
         setSelectedStone(null)
 
-        const originalRedPieces = initialStones.map(r => r.filter(i => i == 2).length).reduce((a,b) => a+b)
-        const redPiecesInGame = newStones.map(r => r.filter(i => i == 2).length).reduce((a,b) => a+b)
+        const originalRedPieces = initialStones.map(r => r.filter(i => i == 2).length).reduce((a, b) => a + b)
+        const redPiecesInGame = newStones.map(r => r.filter(i => i == 2).length).reduce((a, b) => a + b)
         setTakenPiecesRed(originalRedPieces - redPiecesInGame)
-        const originalGreenPieces = initialStones.map(r => r.filter(i => i == 1).length).reduce((a,b) => a+b)
-        const greenPiecesInGame = newStones.map(r => r.filter(i => i == 1).length).reduce((a,b) => a+b)
+        const originalGreenPieces = initialStones.map(r => r.filter(i => i == 1).length).reduce((a, b) => a + b)
+        const greenPiecesInGame = newStones.map(r => r.filter(i => i == 1).length).reduce((a, b) => a + b)
         setTakenPiecesGreen(originalGreenPieces - greenPiecesInGame)
 
         if (isKingInCorner(newStones)) {
@@ -321,7 +321,7 @@ export default function Game(props: {
     }
 
     return (
-        <>
+        <div className="h-screen w-screen">
             <MultiplayerListener onlineGameId={onlineGameId} handleUpdate={setLatestMultiplayerUpdate} />
             <Snackbar
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
@@ -333,9 +333,6 @@ export default function Game(props: {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
-            <div className={showTutorial ? '' : 'hidden'}>
-                <Tutorial setStones={setVisibleStones} finishTutorial={finishTutorial} />
-            </div>
             <Menu
                 showMenu={showMenu}
                 setShowMenu={setShowMenu}
@@ -345,40 +342,51 @@ export default function Game(props: {
                 startTutorial={startTutorial}
                 setOpponentName={setOpponentName}
             />
-            <div className={`text-6xl lg:text-8xl text-center p-5
-                            bg-gradient-to-b from-white ` + (whichTeamIsOn == 1 ? 'bg-emerald-50' : 'bg-rose-50')} >
-                <a href="#" onClick={() => setShowMenu(true)}>
-                    hnefatafl
-                </a>
-
-                <div className="mt-4 text-base" style={{ fontFamily: 'Raleway' }}>
-                    Taken pieces: Red {takenPiecesRed}, Green {takenPiecesGreen}
-                    {opponentName !== null ?
-                        (
-                            opponentName.length == 0 ? ' // Waiting for opponent...' :
-                                <>
-                                    &nbsp;// Online game against {opponentName}
-                                </>
-                        )
-                        : ''}
+            <div className="flex h-full flex-col">
+                <div className="shrink">
+                    <div className={showTutorial ? '' : 'hidden'}>
+                        <Tutorial setStones={setVisibleStones} finishTutorial={finishTutorial} />
+                    </div>
+                    <div className={`h-44 text-6xl lg:text-8xl text-center p-5
+                                bg-gradient-to-b from-white ` + (whichTeamIsOn == 1 ? 'bg-emerald-50' : 'bg-rose-50')} >
+                        <a href="#" onClick={() => setShowMenu(true)}>
+                            hnefatafl
+                        </a>
+                        <div className="mt-4 text-base" style={{ fontFamily: 'Raleway' }}>
+                            Taken pieces: Red {takenPiecesRed}, Green {takenPiecesGreen}
+                            {opponentName !== null ?
+                                (
+                                    opponentName.length == 0 ? ' // Waiting for opponent...' :
+                                        <>
+                                            &nbsp;// Online game against {opponentName}
+                                        </>
+                                )
+                                : ''}
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div className={"grid place-content-center mt-5 duration-500 " +
-                (showThinkingIndicator ? ' opacity-50' : '') +
-                (showTutorial ? 'mt-32 lg:mt-24' : '')}>
-                <div className="aspect-square p-3" style={{
-                    width: '100vh',
-                    maxWidth: 'min(100vw, 600px)'
-                }}>
-                    <Board
-                        stones={visibleStones}
-                        myteam={myteam}
-                        handleStoneClicked={handleStoneClicked}
-                        handleMouseOver={handleMouseOver}
-                        validPathInSelection={validPathInSelection}
-                        selectedStone={selectedStone}
-                        whichTeamIsOn={whichTeamIsOn}
-                    />
+                <div className="grow">
+                    <div className={"grid w-full h-full justify-center duration-500 " +
+                        (showThinkingIndicator ? ' opacity-50' : '') + 
+                        (showTutorial ? 'mt-14' : '')}>
+                        <div 
+                            className="aspect-square p-3" 
+                            style={{
+                                width: '100vh',
+                                maxWidth: 'min(100vw, 600px)'
+                            }}
+                        >
+                            <Board
+                                stones={visibleStones}
+                                myteam={myteam}
+                                handleStoneClicked={handleStoneClicked}
+                                handleMouseOver={handleMouseOver}
+                                validPathInSelection={validPathInSelection}
+                                selectedStone={selectedStone}
+                                whichTeamIsOn={whichTeamIsOn}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
             <div className={
@@ -400,7 +408,7 @@ export default function Game(props: {
                     </p>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 
