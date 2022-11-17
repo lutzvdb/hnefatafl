@@ -8,7 +8,12 @@ import TextField from '@mui/material/TextField';
 import MenuSection from './MenuSection';
 import { testAIspeed } from '../devhelper/AIspeed';
 
-const fontName = 'Raleway'
+import { Megrim as TitleFont, Raleway } from '@next/font/google'
+
+const titleFont = TitleFont({ subsets: ['latin'], weight: '400' })
+const mainFont = Raleway({ subsets: ['latin'] })
+
+const fontName = mainFont.style.fontFamily
 
 export default function Menu(props: {
     restartGame: Function,
@@ -72,11 +77,11 @@ export default function Menu(props: {
             >
                 <div className="grid place-content-center w-full h-full text-6xl text-center rounded-2xl">
                     <div className="bg-white p-10 rounded-3xl bg-opacity-50">
-                        <div className="text-6xl lg:text-8xl xl:text-8xl 2xl:text-8xl text-center pb-5" >
+                        <div className={"text-6xl lg:text-8xl text-center pb-5 text-red-700 drop-shadow-lg " + titleFont.className}>
                             hnefatafl
                         </div>
                         <div className="border-t border-gray-300 w-full mb-5" ></div>
-                        <div className={"text-base lg:text-lg text-left"} style={{ fontFamily: fontName }}>
+                        <div className={"text-base lg:text-lg text-left"}>
                             {/* Save games */}
                             <div className={showSaveGameInput ? '' : 'hidden'}>
                                 <MenuSection title="Save your game locally">
@@ -204,7 +209,7 @@ export default function Menu(props: {
                         </div>
 
                         <div className="border-t border-gray-300 w-full my-5" ></div>
-                        <div className="text-sm" style={{ fontFamily: 'Raleway' }}>
+                        <div className="text-sm">
                             <a href="https://www.thisislutz.com">
                                 coded by lvdb
                             </a>

@@ -14,6 +14,10 @@ import Alert from '@mui/material/Alert';
 import MultiplayerListener from './MultiplayerListener'
 import { sendMoveToServer, updateLatestActive } from '../lib/multiplayer'
 import { Tutorial } from './tutorial'
+import { Megrim as TitleFont, Raleway } from '@next/font/google'
+
+const titleFont = TitleFont({ subsets: ['latin'], weight: '400' })
+const mainFont = Raleway({ subsets: ['latin'] })
 
 export default function Game(props: {
     setBgColor: Function,
@@ -33,13 +37,13 @@ export default function Game(props: {
     const [winnerTeam, setWinnerTeam] = useState<number | null>(null)
     const [snackbarIsOpen, setSnackbarIsOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState('')
-    const [myteam, setMyTeam] = useState([2])
-    const [AImatch, setAImatch] = useState(true) // playing against the computer?
+    const [myteam, setMyTeam] = useState([1,2])
+    const [AImatch, setAImatch] = useState(false) // playing against the computer?
     // onlineGameId: if not null, we're playing online and contains game ID in online DB
     const [onlineGameId, setOnlineGameId] = useState<string | null>(null)
     const [opponentName, setOpponentName] = useState<string | null>(null)
     const [showThinkingIndicator, setShowThinkingIndicator] = useState(false)
-    const [showMenu, setShowMenu] = useState(isDev ? true : true)
+    const [showMenu, setShowMenu] = useState(isDev ? false : true)
     const [latestMultiplayerUpdate, setLatestMultiplayerUpdate] = useState<any | null>(null)
 
     const handleSnackbarClose = () => {
@@ -321,7 +325,7 @@ export default function Game(props: {
     }
 
     return (
-        <div className="h-screen w-screen">
+        <div className={"h-screen w-screen " + mainFont.className}>
             <MultiplayerListener onlineGameId={onlineGameId} handleUpdate={setLatestMultiplayerUpdate} />
             <Snackbar
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
@@ -349,7 +353,7 @@ export default function Game(props: {
                     </div>
                     <div className={`h-44 text-6xl lg:text-8xl text-center p-5
                                 bg-gradient-to-b from-white ` + (whichTeamIsOn == 1 ? 'bg-emerald-50' : 'bg-rose-50')} >
-                        <a href="#" onClick={() => setShowMenu(true)}>
+                        <a href="#" onClick={() => setShowMenu(true)} className={'text-gray-600 drop-shadow-lg ' + titleFont.className}>
                             hnefatafl
                         </a>
                         <div className="mt-4 text-base" style={{ fontFamily: 'Raleway' }}>
