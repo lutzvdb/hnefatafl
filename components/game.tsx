@@ -356,7 +356,7 @@ export default function Game(props: {
                         <a href="#" onClick={() => setShowMenu(true)} className={'text-gray-600 drop-shadow-lg ' + titleFont.className}>
                             hnefatafl
                         </a>
-                        <div className="mt-4 text-base" style={{ fontFamily: 'Raleway' }}>
+                        <div className="mt-4 text-base">
                             Taken pieces: Red {takenPiecesRed}, Green {takenPiecesGreen}
                             {opponentName !== null ?
                                 (
