@@ -389,8 +389,8 @@ export function Tutorial(
     }, [curMove])
 
     return (
-        <div className="absolute top-4 left-4 right-4 h-52 flex flex-row justify-center">
-            <div className="w-full max-w-[600px] h-full bg-white bg-opacity-75 backdrop-blur-md rounded-xl" style={{ fontFamily: 'Raleway' }}>
+        <div className="absolute top-4 left-4 right-4 h-52 flex flex-row justify-center z-40">
+            <div className="w-full max-w-[600px] h-full bg-white bg-opacity-75 backdrop-blur-md rounded-xl" >
                 <div className="flex flex-col h-full p-2">
                     {/* Tutorial text */}
                     <div className="grow flex flex-row">

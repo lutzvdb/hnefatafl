@@ -37,7 +37,7 @@ export default function Game(props: {
     const [winnerTeam, setWinnerTeam] = useState<number | null>(null)
     const [snackbarIsOpen, setSnackbarIsOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState('')
-    const [myteam, setMyTeam] = useState([1,2])
+    const [myteam, setMyTeam] = useState([1, 2])
     const [AImatch, setAImatch] = useState(false) // playing against the computer?
     // onlineGameId: if not null, we're playing online and contains game ID in online DB
     const [onlineGameId, setOnlineGameId] = useState<string | null>(null)
@@ -347,15 +347,17 @@ export default function Game(props: {
                 setOpponentName={setOpponentName}
             />
             <div className="flex h-full flex-col">
-                <div className="shrink">
+                <div className="h-[20vh]">
                     <div className={showTutorial ? '' : 'hidden'}>
                         <Tutorial setStones={setVisibleStones} finishTutorial={finishTutorial} />
                     </div>
-                    <div className={`h-44 text-6xl lg:text-8xl text-center p-5
+                    <div className={`text-5xl sm:text-8xl text-center p-5
                                 bg-gradient-to-b from-white ` + (whichTeamIsOn == 1 ? 'bg-emerald-50' : 'bg-rose-50')} >
-                        <a href="#" onClick={() => setShowMenu(true)} className={'text-gray-600 drop-shadow-lg ' + titleFont.className}>
-                            hnefatafl
-                        </a>
+                        <div className="mainTitle">
+                            <a href="#" onClick={() => setShowMenu(true)} className={'text-gray-600 drop-shadow-lg ' + titleFont.className}>
+                                hnefatafl
+                            </a>
+                        </div>
                         <div className="mt-4 text-base">
                             Taken pieces: Red {takenPiecesRed}, Green {takenPiecesGreen}
                             {opponentName !== null ?
@@ -369,15 +371,15 @@ export default function Game(props: {
                         </div>
                     </div>
                 </div>
-                <div className="grow">
+                <div className="h-[80vh]">
                     <div className={"grid w-full h-full justify-center duration-500 " +
-                        (showThinkingIndicator ? ' opacity-50' : '') + 
+                        (showThinkingIndicator ? ' opacity-50' : '') +
                         (showTutorial ? 'mt-14' : '')}>
-                        <div 
-                            className="aspect-square p-3" 
+                        <div
+                            className="aspect-square p-2 lg:p-8"
                             style={{
-                                width: '100vh',
-                                maxWidth: 'min(100vw, 600px)'
+                                width: '100vw',
+                                maxWidth: 'min(100vw, 80vh)'
                             }}
                         >
                             <Board

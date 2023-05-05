@@ -6,6 +6,24 @@ body {
     background-color: rgba(0, 0, 255, 0.01)
 }
 
+.mainTitle {
+    animation: pulse 15s infinite;
+}
+
+@keyframes pulse {
+	0% {
+		transform: scale(1);
+	}
+
+	50% {
+		transform: scale(1.05);
+	}
+
+	100% {
+		transform: scale(1);
+	}
+}
+
 html,
 body {
     margin: 0;
