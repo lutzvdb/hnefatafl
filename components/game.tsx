@@ -371,7 +371,7 @@ export default function Game(props: {
                         </div>
                     </div>
                 </div>
-                <div className="h-[80vh]">
+                <div className="h-[70vh]">
                     <div className={"grid w-full h-full justify-center duration-500 " +
                         (showThinkingIndicator ? ' opacity-50' : '') +
                         (showTutorial ? 'mt-14' : '')}>
@@ -379,7 +379,7 @@ export default function Game(props: {
                             className="aspect-square p-2 lg:p-8"
                             style={{
                                 width: '100vw',
-                                maxWidth: 'min(100vw, 80vh)'
+                                maxWidth: 'min(100vw, 70vh)'
                             }}
                         >
                             <Board
